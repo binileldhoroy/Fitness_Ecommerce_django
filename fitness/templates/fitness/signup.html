@@ -1,0 +1,38 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<!--/signup -->
+<section class="banner-bottom py-5">
+    {% for error in form.errors %}
+    <p style="color: red; text-align: center;">{{error}}</p>
+    {% endfor %}
+    <div class="container">
+        <div class="content-grid">
+            <div class="text-center icon">
+                <span class="fa fa-user-circle-o"></span>
+            </div>
+            <div class="container-fluid">
+            <div class="content-bottom ">
+                <form method="POST">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="field-group">
+                        <div class="content-input-field">
+                            <label for="floatingInput">{{field.label}}</label>
+                            {{field}}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="content-input-field">
+                        <button type="submit" class="btn">Sign Up</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        </div>
+    </div>
+</section>
+<!-- /signup -->
+
+{% endblock %}

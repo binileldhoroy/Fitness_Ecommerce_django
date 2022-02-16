@@ -1,0 +1,78 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<div class="container">
+    <div class="row mt-5 mb-5">
+    
+        <div class="col-lg-6">
+            <div class="box-element p-3">
+                <h3>Order Summary</h3>
+                <hr>
+                {% for item in items %}
+                <div class="cart-row">
+                    <div style="flex:2"><img class="row-image" src="{{item.product.image1.url}}"></div>
+                    <div style="flex:2"><p>{{item.product.product_name}}</p></div>
+                    <div style="flex:1"><p>{{item.product.price|floatformat:2}}₹</p></div>
+                    <div style="flex:1"><p>x{{item.quantity}}</p></div>
+                </div>
+                {% endfor %}
+                <div class="mt-4 w-100 d-flex justify-content-end">
+                <h5>Items:   {{order.get_cart_items}}</h5>
+                </div>
+                <div class="mt-4 w-100 d-flex justify-content-end">
+                    <h5>Total:   ₹{{order.get_cart_total}}</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 box-element">
+            {% if page == 'address' %}
+            
+            <p>Select Address</p>
+            <hr>
+            <div class="social-ficons mt-4 w-100 d-flex justify-content-end">
+                <ul>
+                    <li><a href="{% url 'change-address' %}" class="btn btn-info btn-view btn-block btn-sm m-1">Add Address</a></li>
+                </ul>
+            </div>
+            <form action="" method="POST">
+                {% csrf_token %}
+            <div class="d-flex " >
+                {% for address in useraddress %}
+                <div class="form-check m-2">
+                    <input class="form-check-input" type="radio" name="adrress" id="{{address.id}}" value="{{address.id}}" >
+                    <label class="form-check-label" for="{{address.id}}">
+                        <p>{{address.address}}</p>
+                        <p>{{address.city}}</p>
+                        <p>{{address.state}}</p>
+                        <p>{{address.pincode}}</p>
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+            <div id="payment-info">
+                <button id="make-payment" class="btn btn-success make-payment">Make Payment</button>
+            </div>
+        </form>
+            {% else %}
+            <div class=" p-1" id="form-wrapper">
+                <form id="form" method="POST">
+                    {% csrf_token %}
+                    <div id="user-info">
+                        {% for field in form %}
+                        <div class="form-field">
+                            <label for="floatingInput">{{field.label}}</label>
+                            {{field}}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <input id="form-button" class="btn btn-success btn-block" type="submit">
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

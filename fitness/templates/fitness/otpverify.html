@@ -1,0 +1,25 @@
+{% extends 'main.html' %}
+{% block content %}
+<section class="banner-bottom py-5">
+    <div class="container">
+        <div class="content-grid">
+            <div class="text-center icon">
+                <span class="fa fa-unlock-alt"></span>
+            </div>
+            <div class="content-bottom">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <div class="field-group">
+                        <div class="content-input-field">
+                            <input name="otp" id="otp" type="password" placeholder="Enter OTP">
+                        </div>
+                    </div>
+                    <div class="content-input-field">
+                        <button type="submit" class="btn">Verify OTP</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

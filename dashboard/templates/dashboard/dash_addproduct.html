@@ -1,0 +1,53 @@
+{% extends 'dashboard_main.html' %}
+
+{% block dashboard %}
+{%load crispy_forms_tags %} 
+{% if page == 'add-product' %}
+<div class="row page-titles">
+  <div class="col-md-5 align-self-center">
+      <h3 class="text-themecolor">Dashboard</h3>
+      <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
+          <li class="breadcrumb-item active">Add Product</li>
+        </ol>
+      </div>
+      <ul>
+        <li><a href="{% url 'add-category' %}" class="btn btn-success btn-block btn-sm m-1">Add Category</a></li>
+      </ul>
+</div>
+<div class="row">
+    <form  method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-success" >Add Product</button>
+    </form>
+    {% else %}
+    <div class="row page-titles">
+      <div class="col-md-5 align-self-center">
+          <h3 class="text-themecolor">Dashboard</h3>
+          <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
+              <li class="breadcrumb-item active">Add Product</li>
+            </ol>
+          </div>
+          <ul>
+            <li><a href="{% url 'add-product' %}" class="btn btn-success btn-block btn-sm m-1">Add Product</a></li>
+          </ul>
+    </div>
+    <div class="row">
+        <form  method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                  <label for="inputPassword6" class="col-form-label">{{field.label}}</label>
+                </div>
+                <div class="col-auto">
+                  {{field}}
+                </div>
+              </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-success" >Add Category</button>
+        </form>
+    {% endif %}
+{% endblock %}

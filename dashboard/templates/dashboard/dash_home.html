@@ -1,0 +1,57 @@
+{% extends 'dashboard_main.html' %}
+
+{% block dashboard %}
+<div class="row page-titles">
+    <div class="col-md-5 align-self-center">
+        <h3 class="text-themecolor">Dashboard</h3>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
+            <li class="breadcrumb-item active">Dashboard</li>
+        </ol>
+    </div>
+</div>
+<div class="row">
+    <!-- Column -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex no-block">
+                    <div>
+                        <h5 class="card-title mb-0">Sales Chart</h5>
+                    </div>
+                    <div class="ms-auto">
+                        <ul class="list-inline text-center font-12">
+                            <li><i class="fa fa-circle text-success"></i> SITE A</li>
+                            <li><i class="fa fa-circle text-info"></i> SITE B</li>
+                            <li><i class="fa fa-circle text-primary"></i> SITE C</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="" id="sales-chart" style="height: 355px;"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Column -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex mb-4 no-block">
+                    <h5 class="card-title mb-0 align-self-center">Our Visitors</h5>
+                    <div class="ms-auto">
+                        <select class="form-select b-0">
+                            <option selected="">Today</option>
+                            <option value="1">Tomorrow</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="visitor" style="height:260px; width:100%;"></div>
+                <ul class="list-inline mt-4 text-center font-12">
+                    <li><i class="fa fa-circle text-purple"></i> Tablet</li>
+                    <li><i class="fa fa-circle text-success"></i> Desktops</li>
+                    <li><i class="fa fa-circle text-info"></i> Mobile</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

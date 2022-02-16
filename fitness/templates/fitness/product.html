@@ -1,0 +1,91 @@
+{% extends 'main.html' %}
+
+{% block content %}
+{% load static %}
+<section class="banner-bottom py-5">
+    <div class="container py-md-5">
+        <!-- product right -->
+        <div class="left-ads-display wthree">
+            <div class="row">
+                <div class="desc1-left col-md-6">
+                    <!-- <img src="{{product.image1.url}}" class="img-fluid" id="img"  alt=""> -->
+
+    <div class="col-lg-11 single-right-left ">
+            <div class="grid images_3_of_2">
+                <div class="flexslider1">
+
+                    <ul class="slides text-center">
+                        <li data-thumb="{{ product.image1.url }}" >
+                            <div class="thumb-image" > <img src="{{ product.image1.url }}" data-imagezoom="true" class="img-fluid" height:"30px" alt=" "> </div>
+                        </li>
+                        <li data-thumb="{{ product.image2.url }}">
+                            <div class="thumb-image"> <img src="{{ product.image2.url }}" data-imagezoom="true" class="img-fluid" alt=" "> </div>
+                        </li>
+                        <li data-thumb="{{ product.image3.url }}">
+                            <div class="thumb-image"> <img src="{{ product.image3.url }}" data-imagezoom="true" class="img-fluid" alt=" "> </div>
+                        </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>  
+    </div>
+                <div class="desc1-right col-md-6 pl-lg-3">
+                    <h3>{{product.product_name}}</h3>
+                    <h5>Rs. {{product.price | floatformat:2}}</h5>
+                    <div class="available mt-3">
+                        <p>{{product.category.name}} </p>
+                    </div>
+                    <div class="available mt-3">
+                        <span>Size </span><span style="border: 1px solid rgb(146, 146, 146);padding: 5px;">{{product.size}} </span>
+                    </div>
+                    <div class="available mt-3">
+                        <small>Description</small>
+                        <p>{{product.description}} </p>
+                    </div>
+                    <div class="share-desc mt-5">
+                        <div class="share text-left">
+                            <div class="social-ficons mt-4">
+                                <ul>
+                                    <li><button id="test" data-product="{{product.id}}" data-action="add" class="btn btn-info btn-view btn-cart btn-block btn-sm m-1 add-btn update-cart">Add to Cart</button></li>
+                                    <li><a href="" class="btn btn-info btn-view btn-block btn-sm m-1">By Now</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+            <!--/row-->
+            <h3 class="title-wthree-single my-lg-5 my-4 text-left">Related Products</h3>
+            <div class="row shop-wthree-info text-center">
+                {% for re_product in re_products %}
+                <div class="col-lg-3 shop-info-grid text-center mt-4">
+                    <div class="product-shoe-info shoe">
+                        <div class="men-thumb-item">
+                            <img src="{{re_product.image1.url}}" class="img-fluid" style="height: 200px;" alt="">
+                        </div>
+                        <div class="item-info-product">
+                            <h4>
+                                <a href="{% url 'product' re_product.id %}">{{re_product.product_name|slice:":30"}} </a><small style="font-size: 12px;">more..</small>
+                            </h4>
+
+                            <div class="product_price">
+                                <div class="grid-price">
+                                    <span class="money"> {{re_product.price | floatformat:2}}₹</span>
+                                    <a href="{% url 'product' re_product.id %}" class="btn btn-info btn-view btn-block btn-sm m-1">View</a>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+            <!--//row-->
+
+        </div>
+    </div>
+</section>
+{% endblock %}

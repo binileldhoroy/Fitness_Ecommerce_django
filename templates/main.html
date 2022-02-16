@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <!-- Custom-Files -->
+    <link rel="stylesheet" href="{% static 'fitness/css/bootstrap.css' %}" />
+    <!-- Bootstrap-Core-CSS -->
+    <link
+      rel="stylesheet"
+      href="{% static 'fitness/css/style.css' %}"
+      type="text/css"
+      media="all"
+    />
+    <!-- Style-CSS -->
+    <!-- font-awesome-icons -->
+    <link href="{% static 'fitness/css/font-awesome.css' %}" rel="stylesheet" />
+    <!-- //font-awesome-icons -->
+    <!-- /Fonts -->
+    <link
+      href="//fonts.googleapis.com/css?family=Hind:300,400,500,600,700"
+      rel="stylesheet"
+    />
+
+    <!-- <link href="{% static 'fitness/css/zoom/bootstrap.css' %}" rel='stylesheet' type='text/css' /> -->
+    <link
+      href="{% static 'fitness/css/zoom/login_overlay.css' %}"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="{% static 'fitness/css/zoom/style6.css' %}"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="{% static 'fitness/css/zoom/shop.css' %}"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'fitness/css/zoom/jquery-ui1.css' %}"
+    />
+    <link
+      href="{% static 'fitness/css/zoom/easy-responsive-tabs.css' %}"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="{% static 'fitness/css/zoom/flexslider.css' %}"
+      type="text/css"
+      media="screen"
+    />
+    <script>
+      var user = "{{request.user}}";
+
+      function getToken(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(
+                cookie.substring(name.length + 1)
+              );
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      const csrftoken = getToken("csrftoken");
+    </script>
+  </head>
+  <body>
+    <div class="main-sec inner-page">
+      <!-- //header -->
+      <header class="py-sm-3 pt-3 pb-2" id="home">
+        <div class="container">
+          <!-- nav -->
+          <div class="top-w3pvt d-flex">
+            <div id="logo">
+              <h1>
+                <a href="{% url 'home' %}"
+                  ><span class="log-w3pvt">F</span>itness</a
+                >
+                <label class="sub-des">Online Store </label>
+              </h1>
+            </div>
+            {% if request.user.is_authenticated %}
+            <div class="forms ml-auto">
+              <h1>
+                <label class="sub-des"
+                  >Welcome {{request.user.first_name}}
+                </label>
+              </h1>
+              <a href="{% url 'logout' %}" class="btn"
+                ><span class="fa fa-user-circle-o"></span> Logout</a
+              >
+            </div>
+            {% else %}
+            <div class="forms ml-auto">
+              <a href="{% url 'login' %}" class="btn"
+                ><span class="fa fa-user-circle-o"></span> Sign In</a
+              >
+              <a href="{% url 'signup' %}" class="btn"
+                ><span class="fa fa-pencil-square-o"></span> Sign Up</a
+              >
+            </div>
+            {% endif %}
+          </div>
+          <div class="nav-top-wthree">
+            <nav>
+              <label for="drop" class="toggle"
+                ><span class="fa fa-bars"></span
+              ></label>
+              <input type="checkbox" id="drop" />
+              <ul class="menu">
+                <li><a href="{% url 'home' %}">Home</a></li>
+                {% if request.user.is_authenticated %}
+                <li><a href="{% url 'user-profile' %}">My Profile</a></li>
+                <li>
+                    <a href="{% url 'cart' %}"><img  id="cart-icon" src="{% static 'fitness/images/cart2.png' %}" >
+                        
+                    </a>
+                    <li style="color: rgb(236 28 36);">{{order.get_cart_items}}</li>
+                </li>
+                {% endif %}
+              </ul>
+            </nav>
+            <!-- //nav -->
+            <div class="search-form ml-auto">
+              <div class="form-w3layouts-grid">
+                <form action="#" method="post" class="newsletter">
+                  <input
+                    class="search"
+                    type="search"
+                    placeholder="Search here..."
+                    required=""
+                  />
+                  <button class="form-control btn" value="">
+                    <span class="fa fa-search"></span>
+                  </button>
+                </form>
+                
+              </div>
+              
+            </div>
+            <div class="clearfix">
+                
+            </div>
+          </div>
+        </div>
+      </header>
+      <!-- //header -->
+    </div>
+
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+      <button
+        type="button"
+        class="close"
+        data-dismiss="alert"
+        aria-label="Close"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+      {{ message | safe }}
+    </div>
+    {% endfor %} {% block content %} {% endblock %}
+
+    <!--/shipping-->
+    <section class="shipping-wthree">
+      <div class="shiopping-grids d-lg-flex">
+        <div class="col-lg-4 shiopping-w3pvt-gd text-center">
+          <div class="icon-gd">
+            <span class="fa fa-truck test" aria-hidden="true"></span>
+          </div>
+          <div class="icon-gd-info">
+            <h3>FREE SHIPPING</h3>
+            <p>On all order over $2000</p>
+          </div>
+        </div>
+        <div class="col-lg-4 shiopping-w3pvt-gd sec text-center">
+          <div class="icon-gd">
+            <span class="fa fa-bullhorn test" aria-hidden="true"></span>
+          </div>
+          <div class="icon-gd-info">
+            <h3>FREE RETURN</h3>
+            <p>On 1st exchange in 30 days</p>
+          </div>
+        </div>
+        <div class="col-lg-4 shiopping-w3pvt-gd text-center">
+          <div class="icon-gd">
+            <span class="fa fa-gift test" aria-hidden="true"></span>
+          </div>
+          <div class="icon-gd-info">
+            <h3>MEMBER DISCOUNT</h3>
+            <p>Register &amp; save up to $29%</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!--//shipping-->
+    <!-- footer -->
+    <div class="footer_agileinfo_topf py-5">
+      <div class="container py-md-5">
+        <div class="row">
+          <div class="col-lg-3 footer_wthree_gridf mt-lg-5">
+            <h2>
+              <a href="{% url 'home' %}"><span>F</span>itness </a>
+            </h2>
+            <label class="sub-des2">Online Store</label>
+          </div>
+          <div class="col-lg-3 footer_wthree_gridf mt-md-0 mt-4">
+            <ul class="footer_wthree_gridf_list">
+              <li>
+                <a href="index.html"
+                  ><span class="fa fa-angle-right" aria-hidden="true"></span>
+                  Home</a
+                >
+              </li>
+              <li>
+                <a href="about.html"
+                  ><span class="fa fa-angle-right" aria-hidden="true"></span>
+                  About</a
+                >
+              </li>
+              <li>
+                <a href="shop.html"
+                  ><span class="fa fa-angle-right" aria-hidden="true"></span>
+                  Shop</a
+                >
+              </li>
+              <li>
+                <a href="shop.html"
+                  ><span class="fa fa-angle-right" aria-hidden="true"></span
+                  >Collections</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="col-lg-3 footer_wthree_gridf mt-md-0 mt-sm-4 mt-3">
+            <ul class="footer_wthree_gridf_list">
+              <li>
+                <a href="single.html"
+                  ><span class="fa fa-angle-right" aria-hidden="true"></span>
+                  Extra Page</a
+                >
+              </li>
+
+              <li>
+                <a href="#"
+                  ><span class="fa fa-angle-right" aria-hidden="true"></span>
+                  Terms & Conditions</a
+                >
+              </li>
+              <li>
+                <a href="single.html"
+                  ><span class="fa fa-angle-right" aria-hidden="true"></span>
+                  Shop Single</a
+                >
+              </li>
+              <li>
+                <a href="contact.html"
+                  ><span class="fa fa-angle-right" aria-hidden="true"></span>
+                  Contact Us</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-lg-3 footer_wthree_gridf mt-md-0 mt-sm-4 mt-3">
+            <ul class="footer_wthree_gridf_list">
+              <li>
+                <a href="login.html"
+                  ><span class="fa fa-angle-right" aria-hidden="true"></span>
+                  Login
+                </a>
+              </li>
+
+              <li>
+                <a href="register.html"
+                  ><span class="fa fa-angle-right" aria-hidden="true"></span
+                  >Register</a
+                >
+              </li>
+              <li>
+                <a href="#"
+                  ><span class="fa fa-angle-right" aria-hidden="true"></span
+                  >Privacy & Policy</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="w3ls-fsocial-grid">
+          <h3 class="sub-w3ls-headf">Follow Us</h3>
+          <div class="social-ficons">
+            <ul>
+              <li>
+                <a href="#"><span class="fa fa-facebook"></span> Facebook</a>
+              </li>
+              <li>
+                <a href="#"><span class="fa fa-twitter"></span> Twitter</a>
+              </li>
+              <li>
+                <a href="#"><span class="fa fa-google"></span>Google</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="move-top text-center mt-lg-4 mt-3">
+          <a href="#home"
+            ><span class="fa fa-angle-double-up" aria-hidden="true"></span
+          ></a>
+        </div>
+      </div>
+    </div>
+    <!-- //footer -->
+    <!-- copyright -->
+    <div class="cpy-right text-center py-3">
+      <p>
+        © 2019 Fitness. All rights reserved | Design by
+        <a href="http://w3layouts.com"> W3layouts.</a>
+      </p>
+    </div>
+    <!-- //copyright -->
+
+    <script src="{% static 'fitness/js/zoom/jquery-2.2.3.min.js' %}"></script>
+    <script src="{% static 'fitness/js/zoom/modernizr-2.6.2.min.js' %}"></script>
+    <script src="{% static 'fitness/js/zoom/classie-search.js' %}"></script>
+    <script src="{% static 'fitness/js/zoom/demo1-search.js' %}"></script>
+    <script src="{% static 'fitness/js/zoom/minicart.js' %}"></script>
+    <script src="{% static 'fitness/js/zoom/imagezoom.js' %}"></script>
+
+    <script src="{% static 'fitness/js/zoom/easy-responsive-tabs.js' %}"></script>
+    <script src="{% static 'fitness/js/cart.js' %}"></script>
+
+    <script src="{% static 'fitness/js/zoom/jquery.flexslider.js' %}"></script>
+    <script>
+      // Can also be used with $(document).ready()
+      $(window).load(function () {
+        $(".flexslider1").flexslider({
+          animation: "slide",
+          controlNav: "thumbnails",
+        });
+      });
+    </script>
+    <script src="{% static 'fitness/js/zoom/bootstrap.js' %}"></script>
+  </body>
+</html>
