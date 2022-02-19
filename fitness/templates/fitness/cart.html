@@ -2,16 +2,19 @@
 
 {% block content %}
 {% load static %}
+
 <div class="container">
 <div class="row mt-5 mb-5">
     <div class="col-lg-12">
+        {% if order.get_cart_items >= 1 %}
         <div class="box-element">
             <table class="table">
                 <tr>
-                    <th><h5>Items: <strong>{{order.get_cart_items}}</strong></h5></th>
-                    <th><h5>Total:<strong>₹{{order.get_cart_total|floatformat:2}}</strong></h5></th>
+                    <th><h5>Items: <strong id="items" >{{order.get_cart_items}}</strong></h5></th>
+                    <th><h5>Total:<strong id="cart_total">₹{{order.get_cart_total|floatformat:2}}</strong></h5></th>
                     <th>
                         <a style="float:right; margin:5px;" class="btn btn-success" href="{% url 'check-out' %}">Checkout</a>
+                        
                     </th>
                 </tr>
             </table>
@@ -28,23 +31,81 @@
                 <div style="flex:1"><strong>Total</strong></div>
             </div>
             {% for item in items %}
-            <div class="cart-row">
+            <div class="cart-row" id="{{item.product.id}}">
                 <div style="flex:2"><img class="row-image" src="{{ item.product.image1.url }}"></div>
                 <div style="flex:2"><p style=" margin-top: 15px;">{{item.product.product_name}}</p></div>
                 <div style="flex:1"><p style=" margin-top: 15px;">₹{{item.product.price|floatformat:2}}</p></div>
                 <div style="flex:1">
-                    <p class="quantity">x {{item.quantity}}</p>
+                    <p class="quantity" id="quantity">x {{item.quantity}}</p>
                     <div class="quantity" style=" margin-top: 10px;">
-                        <img data-product="{{item.product.id}}" data-action="add" class="chg-quantity update-cart" src="{% static  'fitness/images/up-arrow.png' %}">
+                       <span id="btntrue"> <img  data-product="{{item.product.id}}" data-action="add" class="chg-quantity update-cart" src="{% static  'fitness/images/up-arrow.png' %}"></span>
+                       <!-- <span id="btnfalse"> <img  class="chg-quantity" src="{% static  'fitness/images/up-arrow.png' %}"></span> -->
                 
                         <img data-product="{{item.product.id}}" data-action="remove" class="chg-quantity update-cart" src="{% static  'fitness/images/down-arrow.png' %}">
                     </div>
+                    <span id="max_stock" style="font-size: 12px; color: red;">Max Stock</span>
                 </div>
-                <div style="flex:1"><p style=" margin-top: 15px;">₹{{ item.get_total|floatformat:2 }}</p></div>
+                <div style="flex:1"><p style=" margin-top: 15px;">₹<span id="total">{{ item.get_total|floatformat:2 }}</span></p></div>
             </div>
             {% endfor %}
         </div>
+        {% else %}
+        <a  class="btn btn-outline-dark" href="{% url 'home' %}">&#x2190; Continue Shopping</a>
+        {% endif %}
     </div>
 </div>
 </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$('.update-cart').on('click',function (e) {
+var product = $(this).data('product')
+var action = $(this).data('action')
+console.log(product)
+console.log(action)
+  $.ajax({
+      type : 'POST',
+      url : "{% url 'update-item' %}",
+      data : {
+          productId : product,
+          action : action,
+          csrfmiddlewaretoken : "{{ csrf_token }}"
+      },
+      dataType: 'json',
+      success:function(response){
+        var items = response.items
+        var quantity = response.quantity
+        var total = response.total
+        var cart_total = response.cart_total
+        var productId = response.productId
+        var stock = response.stock
+
+        
+        // console.log(cur_stock)
+        if(stock == 0){
+           $('#'+productId + ' #max_stock').show();
+        }else{
+            $('#'+productId + ' #max_stock').hide();
+        }
+
+        if(quantity == 0){
+            location.reload();
+        }
+        
+        var total_id = '#' + productId + " #total"
+        var item_id =  " #items"
+        var cart_total_id = " #cart_total"
+        var quantity_id = '#' + productId + " #quantity"
+       
+        $(total_id).html(total + '.00')
+        $(item_id).html(items )
+        $(cart_total_id).html('₹' + cart_total + '.00')
+        $(quantity_id).html('x ' + quantity)
+       
+        
+      }
+  });
+});
+</script>
+
 {% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'dashboard_main.html' %}
+
+{% block dashboard %}
+<div class="row page-titles">
+    <div class="col-md-5 align-self-center">
+        <h3 class="text-themecolor">Dashboard</h3>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
+            <li class="breadcrumb-item active">Order list</li>
+        </ol>
+    </div>
+</div>
+<div class="row">
+    <!-- column -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="col-lg-6">
+                    <div class="box-element p-3">
+                        <h3>Order Items</h3>
+                        <hr>
+                        <p>{{order.user.first_name}} {{order.user.last_name}}</p>
+                        {% for item in items %}
+                        <div class="cart-row">
+                            <div style="flex:2"><img class="row-image" style="height: 100px;" src="{{item.product.image1.url}}"></div>
+                            <div style="flex:2"><p>{{item.product.product_name}}</p></div>
+                            <div style="flex:1"><p>{{item.product.price|floatformat:2}}₹</p></div>
+                            <div style="flex:1"><p>{{item.quantity}}</p></div>
+                        </div>
+                        {% endfor %}
+                        <span>Total:-  ₹ {{order.get_cart_total}}</span>
+                    </div>
+                </div>
+                <div class="container w-100 p-0 d-flex ">
+                {% if order.approve_status == False %}
+                    {% if order.cancel_status == False %}
+                    <a href="{% url 'order-accept' order.id %}" class="btn btn-success btn-block btn-sm m-1">Accept</a>
+                    {% else %}
+                    <span class="btn btn-secondary">Order Canceled by User</span>
+                    {% endif %}
+                {% else %}
+                    {% if order.shipped_status == False %}
+                    <a href="{% url 'order-shipped' order.id %}" class="btn btn-success btn-block btn-sm m-1">Ship Now</a>
+                    {% else %}
+                        {% if order.delivery_status == True %}
+                            <span   span class="btn btn-success">Order Shipped</span>
+                        {% endif %}
+                        {% if order.delivery_status == False %}
+                            <a href="{% url 'order-delivered' order.id %}" class="btn btn-success btn-block btn-sm m-1">Delivered</a>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+                {% if order.approve_status == False %}
+                    {% if order.cancel_status == False %}
+                    <a href="" class="btn btn-danger btn-block btn-sm m-1">Cancle</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

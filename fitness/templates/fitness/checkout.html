@@ -40,7 +40,7 @@
             <div class="d-flex " >
                 {% for address in useraddress %}
                 <div class="form-check m-2">
-                    <input class="form-check-input" type="radio" name="adrress" id="{{address.id}}" value="{{address.id}}" >
+                    <input class="form-check-input" type="radio" checked name="adrress" id="{{address.id}}" value="{{address.id}}" >
                     <label class="form-check-label" for="{{address.id}}">
                         <p>{{address.address}}</p>
                         <p>{{address.city}}</p>
@@ -51,7 +51,18 @@
                 {% endfor %}
             </div>
             <div id="payment-info">
-                <button id="make-payment" class="btn btn-success make-payment">Make Payment</button>
+                <div class="col-md-11 p-3 m-2 border-secondary border">
+                    <h4>SELECT PAYMENT METHOD</h4>
+                    <div class="text-left pl-3">
+                       <!-- <input class="mb-2" type="radio" checked name="payment" id="netBANKING" value="netBANKING"> netBANKING <br>
+                       <input class="mb-2" type="radio" checked name="payment" id="UPI" value="UPI"> UPI <br> -->
+                       <input class="mb-2" type="radio" checked name="payment" id="PayPal" value="PayPal"> PayPal <br>
+                       <input class="mb-2" type="radio" checked name="payment" id="COD" value="COD"> COD <br>
+                       <!-- <button class="col-md-11 btn btn-lg btn-info mt-4" id="proceed">Place Order</button> -->
+                       <button id="proceed" class="btn btn-success make-payment">Place Order</button>
+                     </div>
+                   </div>
+                <!-- <button id="make-payment" class="btn btn-success make-payment">Place Order</button> -->
             </div>
         </form>
             {% else %}
@@ -74,5 +85,31 @@
         </div>
     </div>
 </div>
+
+<!-- <script>
+    $("#proceed").on("click", function (e) {
+      var payment = $('input[name="payment"]:checked').val();
+      var address = $('input[name="address"]:checked').val();
+      if (payment == 'COD'){
+        alert('working')
+        $.ajax({
+          type: "POST",
+          url: "{% url 'check-out' %}",
+          data: {
+            payment : payment,
+            address : address,
+            csrfmiddlewaretoken : "{{ csrf_token }}"
+          },
+          dataType: "json",
+          success: function (response) {
+            alert('CONGRATS, Order Sent !')
+            location = '{% url "payment-complete" %}'
+          },
+        });
+      }else{
+        alert('please select "COD"')
+      }
+      });
+</script> -->
 
 {% endblock %}

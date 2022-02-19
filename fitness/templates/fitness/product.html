@@ -88,4 +88,27 @@
         </div>
     </div>
 </section>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+  
+  $('.update-cart').on('click',function (e) {
+var product = $(this).data('product')
+var action = $(this).data('action')
+console.log(product)
+console.log(action)
+  $.ajax({
+      type : 'POST',
+      url : "{% url 'update-item' %}",
+      data : {
+          productId : product,
+          action : action,
+          csrfmiddlewaretoken : "{{ csrf_token }}"
+      },
+      dataType: 'json',
+      success:function(response){
+        
+      }
+  });
+});
+</script>
 {% endblock %}

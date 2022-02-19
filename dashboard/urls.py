@@ -12,4 +12,9 @@ urlpatterns = [
     path('edit-product/<str:pk>',views.editProduct,name='edit-product'),
     path('delete-product/<str:pk>',views.deleteProduct,name='delete-product'),
     path('add-category',views.addCategory,name='add-category'),
+    path('order-list',views.viewOrders,name='order-list'),
+    path('order-items/<str:pk>',views.orderItemView,name='order-items'),
+    path('order-accept/<str:pk>',views.orderAccept,name='order-accept'),
+    path('order-shipped/<str:pk>',views.orderShipped,name='order-shipped'),
+    path('order-delivered/<str:pk>',views.orderDelivered,name='order-delivered'),
 ]

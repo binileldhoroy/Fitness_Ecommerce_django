@@ -2,6 +2,10 @@
 
 {% block dashboard %}
 {%load crispy_forms_tags %} 
+{% load static %}
+  <!-- image crop script -->
+  
+
 {% if page == 'add-product' %}
 <div class="row page-titles">
   <div class="col-md-5 align-self-center">
@@ -15,12 +19,28 @@
         <li><a href="{% url 'add-category' %}" class="btn btn-success btn-block btn-sm m-1">Add Category</a></li>
       </ul>
 </div>
+
+
+
 <div class="row">
     <form  method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form|crispy }}
-        <button type="submit" class="btn btn-success" >Add Product</button>
+        <button type="submit" id="confirm-btn" class="btn btn-success" >Add Product</button>
     </form>
+    <!-- imagecrop div -->
+    <div class="col-md-5">
+      <div class="form-group">
+          <div id="image-box" class="image-container"></div>
+          <button class="btn btn-outline-info" id="crop-btn"
+              style=" margin-top: 10px; display: none;" type="button">Crop</button>
+      </div>
+    </div>
+
+    <!-- imagecrop div end -->
+    <img src="" id="image1" style="width:100px;">
+    <img src="" id="image2" style="width:100px;">
+    <img src="" id="image3" style="width:100px;">
     {% else %}
     <div class="row page-titles">
       <div class="col-md-5 align-self-center">
@@ -34,6 +54,7 @@
             <li><a href="{% url 'add-product' %}" class="btn btn-success btn-block btn-sm m-1">Add Product</a></li>
           </ul>
     </div>
+    <
     <div class="row">
         <form  method="POST" enctype="multipart/form-data">
             {% csrf_token %}
@@ -50,4 +71,6 @@
             <button type="submit" class="btn btn-success" >Add Category</button>
         </form>
     {% endif %}
+
+    <script src="{% static 'dashboard/js/crop.js' %}"></script>
 {% endblock %}

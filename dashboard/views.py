@@ -1,3 +1,4 @@
+from multiprocessing import context
 from django.shortcuts import redirect, render
 from fitness.models import User
 from django.contrib import messages
@@ -5,7 +6,7 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from .forms import ProductForm,CategoryForm
-from .models import Product,Category
+from .models import Order, Product,Category
 
 # Create your views here.
 @never_cache
@@ -41,15 +42,24 @@ def adminLogout(request):
 @never_cache
 @login_required(login_url='admin-login')
 def adminHome(request):
-    return render(request,'dashboard/dash_home.html')
+    if request.user.username == 'binil':
+        return render(request,'dashboard/dash_home.html')
+    else:
+        return redirect('login')
+        
+    
 
 
 @never_cache
 @login_required(login_url='admin-login')
 def viewUser(request):
-    users = User.objects.all()
-    context = {'users':users}
-    return render(request,'dashboard/view_user.html',context)
+    if request.user.username == 'binil':
+        users = User.objects.all()
+        context = {'users':users}
+        return render(request,'dashboard/view_user.html',context)
+    else:
+        return redirect('login')
+    
 
 
 @never_cache
@@ -120,5 +130,76 @@ def addCategory(request):
         return render(request,'dashboard/dash_addproduct.html',{'form':form})
 
 
+
+@never_cache
+@login_required(login_url='admin-login')
 def viewOrders(request):
-    return render(request,'view_orders.html')
+    if request.user.is_authenticated:
+        orders = Order.objects.all().filter(order_status=True)
+    else:
+        messages.error(request,'Empty Orders')
+        return render(request,'dashboard/view_orders.html')
+    context = {'orders':orders}    
+
+    return render(request,'dashboard/view_orders.html',context)
+
+
+@never_cache
+@login_required(login_url='admin-login')
+def orderItemView(request,pk):
+    if request.user.is_authenticated:
+        order = Order.objects.get(id=pk)
+        items = order.orderitem_set.all()
+    else:
+        messages.error(request,'Something went wrong')
+        return render(request,'dashboard/view_items.html')
+    context = {'order':order,'items':items}    
+
+    return render(request,'dashboard/view_items.html',context)
+
+
+@never_cache
+@login_required(login_url='admin-login')
+def orderAccept(request,pk):
+    if request.user.is_authenticated:
+        Order.objects.filter(id=pk).update(approve_status=True)
+        order = Order.objects.get(id=pk)
+        items = order.orderitem_set.all()
+    else:
+        messages.error(request,'Something went wrong')
+        return render(request,'dashboard/view_items.html')
+    context = {'order':order,'items':items}
+        
+    return render(request,'dashboard/view_items.html',context)
+
+
+@never_cache
+@login_required(login_url='admin-login')
+def orderShipped(request,pk):
+    if request.user.is_authenticated:
+        Order.objects.filter(id=pk).update(shipped_status=True)
+        order = Order.objects.get(id=pk)
+        items = order.orderitem_set.all()
+    else:
+        messages.error(request,'Something went wrong')
+        return render(request,'dashboard/view_items.html')
+    context = {'order':order,'items':items}
+        
+    return render(request,'dashboard/view_items.html',context)
+
+
+@never_cache
+@login_required(login_url='admin-login')
+def orderDelivered(request,pk):
+    if request.user.is_authenticated:
+        Order.objects.filter(id=pk).update(delivery_status=True)
+        order = Order.objects.get(id=pk)
+        items = order.orderitem_set.all()
+    else:
+        messages.error(request,'Something went wrong')
+        return render(request,'dashboard/view_items.html')
+    context = {'order':order,'items':items}
+        
+    return render(request,'dashboard/view_items.html',context)
+
+

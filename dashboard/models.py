@@ -32,6 +32,14 @@ class Order(models.Model):
     order_status = models.BooleanField(default=False)
     date_ordered = models.DateTimeField(auto_now_add=True)
     address = models.ForeignKey(ShippingAddress,on_delete=models.SET_NULL, null=True, blank=True)
+    date = models.CharField(max_length=100,null=True)
+    approve_status = models.BooleanField(default=False)
+    shipped_status = models.BooleanField(default=False)
+    cancel_status = models.BooleanField(default=False)
+    delivery_status = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('-date_ordered',)
 
     def __str__(self):
         return str(self.id)

@@ -58,7 +58,12 @@
       type="text/css"
       media="screen"
     />
-    <script>
+    <style>
+      #max_stock{
+          display: none;
+      }
+  </style>
+    <!-- <script>
       var user = "{{request.user}}";
 
       function getToken(name) {
@@ -79,7 +84,7 @@
         return cookieValue;
       }
       const csrftoken = getToken("csrftoken");
-    </script>
+    </script> -->
   </head>
   <body>
     <div class="main-sec inner-page">
@@ -127,7 +132,8 @@
               <ul class="menu">
                 <li><a href="{% url 'home' %}">Home</a></li>
                 {% if request.user.is_authenticated %}
-                <li><a href="{% url 'user-profile' %}">My Profile</a></li>
+                <li><a href="">My Profile</a></li>
+                <li><a href="{% url 'my-orders' %}">My Orders</a></li>
                 <li>
                     <a href="{% url 'cart' %}"><img  id="cart-icon" src="{% static 'fitness/images/cart2.png' %}" >
                         
@@ -337,6 +343,7 @@
     </div>
     <!-- //copyright -->
 
+
     <script src="{% static 'fitness/js/zoom/jquery-2.2.3.min.js' %}"></script>
     <script src="{% static 'fitness/js/zoom/modernizr-2.6.2.min.js' %}"></script>
     <script src="{% static 'fitness/js/zoom/classie-search.js' %}"></script>
@@ -345,7 +352,7 @@
     <script src="{% static 'fitness/js/zoom/imagezoom.js' %}"></script>
 
     <script src="{% static 'fitness/js/zoom/easy-responsive-tabs.js' %}"></script>
-    <script src="{% static 'fitness/js/cart.js' %}"></script>
+    <!-- <script src="{% static 'fitness/js/cart.js' %}"></script> -->
 
     <script src="{% static 'fitness/js/zoom/jquery.flexslider.js' %}"></script>
     <script>
