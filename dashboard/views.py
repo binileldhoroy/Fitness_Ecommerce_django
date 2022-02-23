@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from .forms import ProductForm,CategoryForm
-from .models import Order, Product,Category
+from .models import *
 
 # Create your views here.
 @never_cache
@@ -47,8 +47,6 @@ def adminHome(request):
     else:
         return redirect('login')
         
-    
-
 
 @never_cache
 @login_required(login_url='admin-login')
@@ -195,6 +193,8 @@ def orderDelivered(request,pk):
         Order.objects.filter(id=pk).update(delivery_status=True)
         order = Order.objects.get(id=pk)
         items = order.orderitem_set.all()
+        payment = Payment.objects.filter(order=order).update(payment_status=True)
+        print(payment)
     else:
         messages.error(request,'Something went wrong')
         return render(request,'dashboard/view_items.html')

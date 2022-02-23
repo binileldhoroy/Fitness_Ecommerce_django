@@ -1,0 +1,11 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<div class="container">
+<h2> Delete! Are you sure?</h2>
+    <form action="" method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Delete</button>
+    </form>
+</div>
+{% endblock %}

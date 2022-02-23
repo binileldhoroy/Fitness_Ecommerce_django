@@ -27,6 +27,7 @@
                                 <th>Items</th>
                                 <th>Total Amount</th>
                                 <th>Status</th>
+                                <th>View</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -40,6 +41,13 @@
                                 <td>{{order.date}}</td>
                                 <td>{{order.get_cart_items}}</td>
                                 <td>{{order.payment.payment_amount}}</td>
+                                <td>
+                                    {% if order.delivery_status == True %}
+                                        <p style="color: green;">Product Delevered</p>
+                                    {% else %}
+                                    <p style="color: orange;">Order pending</p>
+                                    {% endif %}
+                                </td>
                                 <td><a href="{% url 'order-items' order.id %}" class="btn btn-success btn-block btn-sm m-1">View Items</a></td>
                             </tr>
                             {% endif %}

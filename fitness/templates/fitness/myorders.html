@@ -6,7 +6,7 @@
     {% if order.get_cart_items >= 1 %}
     <div class="box-element mt-5">
         <div class="text-center p-2">
-            <h5>Order Date:- {{order.date}} Items:- {{order.get_cart_items}}</h5>
+            <h5>{{order.id}} Order Date:- {{order.date}} Items:- {{order.get_cart_items}}</h5>
         </div>
         <div class="container w-100 p-0 d-flex justify-content-end">
             {% if order.approve_status == False %}

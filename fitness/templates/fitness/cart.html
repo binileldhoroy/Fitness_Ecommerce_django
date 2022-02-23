@@ -13,7 +13,7 @@
                     <th><h5>Items: <strong id="items" >{{order.get_cart_items}}</strong></h5></th>
                     <th><h5>Total:<strong id="cart_total">₹{{order.get_cart_total|floatformat:2}}</strong></h5></th>
                     <th>
-                        <a style="float:right; margin:5px;" class="btn btn-success" href="{% url 'check-out' %}">Checkout</a>
+                        <a style="float:right; margin:5px;" id="checkout" class="btn btn-success" href="{% url 'check-out' %}">Checkout</a>
                         
                     </th>
                 </tr>
@@ -101,6 +101,7 @@ console.log(action)
         $(item_id).html(items )
         $(cart_total_id).html('₹' + cart_total + '.00')
         $(quantity_id).html('x ' + quantity)
+        $('#cart_items').html(items)
        
         
       }

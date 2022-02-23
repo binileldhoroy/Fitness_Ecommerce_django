@@ -58,10 +58,18 @@
       type="text/css"
       media="screen"
     />
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <style>
       #max_stock{
           display: none;
       }
+
+      #add_cart{
+          display: none;
+      }
+
+
   </style>
     <!-- <script>
       var user = "{{request.user}}";
@@ -132,13 +140,13 @@
               <ul class="menu">
                 <li><a href="{% url 'home' %}">Home</a></li>
                 {% if request.user.is_authenticated %}
-                <li><a href="">My Profile</a></li>
+                <li><a href="{% url 'my-profile' %}">My Profile</a></li>
                 <li><a href="{% url 'my-orders' %}">My Orders</a></li>
                 <li>
                     <a href="{% url 'cart' %}"><img  id="cart-icon" src="{% static 'fitness/images/cart2.png' %}" >
                         
                     </a>
-                    <li style="color: rgb(236 28 36);">{{order.get_cart_items}}</li>
+                    <li style="color: rgb(236 28 36);" id="cart_items">{{order.get_cart_items}}</li>
                 </li>
                 {% endif %}
               </ul>
@@ -352,6 +360,7 @@
     <script src="{% static 'fitness/js/zoom/imagezoom.js' %}"></script>
 
     <script src="{% static 'fitness/js/zoom/easy-responsive-tabs.js' %}"></script>
+    <script src="{% static 'fitness/js/checkout.js' %}"></script>
     <!-- <script src="{% static 'fitness/js/cart.js' %}"></script> -->
 
     <script src="{% static 'fitness/js/zoom/jquery.flexslider.js' %}"></script>

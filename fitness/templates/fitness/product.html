@@ -30,7 +30,7 @@
             </div>
         </div>  
     </div>
-                <div class="desc1-right col-md-6 pl-lg-3">
+                <div class="desc1-right col-md-6 pl-lg-3" id="{{product.id}}">
                     <h3>{{product.product_name}}</h3>
                     <h5>Rs. {{product.price | floatformat:2}}</h5>
                     <div class="available mt-3">
@@ -47,13 +47,19 @@
                         <div class="share text-left">
                             <div class="social-ficons mt-4">
                                 <ul>
+                                    {% if product.stock == 0 %}
+                                    <li><button id="test"  class="btn btn-info btn-view btn-cart btn-block btn-sm m-1 add-btn ">Add to Cart</button></li>
+                                    <li><span style=" color: red;">Out Of Stock</span></li>
+                                    {% else %}
                                     <li><button id="test" data-product="{{product.id}}" data-action="add" class="btn btn-info btn-view btn-cart btn-block btn-sm m-1 add-btn update-cart">Add to Cart</button></li>
+                                    {% endif %}
                                     <li><a href="" class="btn btn-info btn-view btn-block btn-sm m-1">By Now</a></li>
                                 </ul>
                             </div>
                         </div>
                         <div class="clearfix"></div>
                     </div>
+                    <span id="add_cart" style=" color: red;">Out Of Stock</span>
                 </div>
             </div>
             <!--/row-->
@@ -106,7 +112,18 @@ console.log(action)
       },
       dataType: 'json',
       success:function(response){
+        var productId = response.productId
+        var stock = response.stock
+        var items = response.items
+
         
+        // console.log(cur_stock)
+        if(stock == 0){
+           $('#'+productId + ' #add_cart').show();
+        }else{
+            $('#'+productId + ' #add_cart').hide();
+        }
+        $('#cart_items').html(items)
       }
   });
 });

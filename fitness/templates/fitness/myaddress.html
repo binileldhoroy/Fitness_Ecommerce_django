@@ -1,0 +1,126 @@
+{% extends 'main.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="bs-example row">
+        <div class="col-md-4">
+
+            <div class="card" style="width: 18rem;">
+                <ul class="list-group list-group-flush" id="list">
+                    <a href="{% url 'my-profile' %}"><li class="list-group-item  side_section" value="sectionB">My Profile</li></a>
+                    <a href="{% url 'my-address' %}"><li class="list-group-item active side_section" value="sectionA">Add Address</li></a>
+                    <a href="{% url 'change-password' %}"><li class="list-group-item  side_section" value="sectionA">Change Password</li></a>
+                </ul>
+            </div>
+
+        </div>
+
+
+        <div class="col-md-8">
+            <div class="tab-content" >
+
+                <div class="all_address  ">
+                <div class=" p-1  row" id="form-wrapper">
+                {% for address in useraddress %}
+                <div class="col-md-6" >
+                    <div class="form-check m-2 box-element " style="height: 300px;">
+                        <div class="social-ficons mt-4 w-100 d-flex justify-content-end">
+                            <ul>
+                                <li><a href="{% url 'change-address' address.id %}"  class="btn  btn-block btn-outline-success btn-sm m-1">Edit</a></li>
+                                <li><a href="{% url 'delete-address' address.id %}"  class="btn btn-block btn-outline-danger btn-sm  m-1">Delete</a></li>
+                            </ul>
+                        </div>
+                        <label class="form-check-label" for="{{address.id}}">
+                            <p>{{address.f_name}} {{address.l_name}}</p>
+                            <p>{{address.email}}, {{address.phone}}</p>
+                            <p>{{address.address1}}, {{address.address2}}</p>
+                            <p>{{address.city}}</p>
+                            <p>{{address.state}}</p>
+                            <p>{{address.pincode}}</p>
+                            <p>{{address.post_office}}</p>
+                        </label>
+                        
+                    </div>
+                </div>
+                    {% endfor %}
+            </div>
+        </div>
+
+
+                <div id="section">
+                    <div id="click-div" ADD ADDRESS</div>
+                    <div id="section-A" class="tab-pane mt-4">
+
+                        <form action="" method="POST">
+                            {% csrf_token %}
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="inputEmail4">First Name</label>
+                                    <input type="text" name="firstname" class="form-control" id="inputEmail4"
+                                        placeholder="First Name" required>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="inputEmail4">Last Name</label>
+                                    <input type="text" name="lastname" class="form-control" id="inputEmail4"
+                                        placeholder="Last Name" required>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="inputEmail4">Email</label>
+                                    <input type="email" name="email" class="form-control" id="inputEmail4"
+                                        placeholder="Email" required>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="inputEmail4">Phone</label>
+                                    <input type="number" name="phone" class="form-control" id="inputEmail4"
+                                        placeholder="Mobile Number" required>
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="inputAddress">Address</label>
+                                <input type="text" class="form-control" id="inputAddress" name="address1"
+                                    placeholder="Street Address" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputAddress2">Address 2</label>
+                                <input type="text" class="form-control" id="inputAddress2" name="address2"
+                                    placeholder="Apartment, studio, or floor" required>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    <label for="inputZip">Zip</label>
+                                    <input type="text" class="form-control" name="pin" placeholder="Pincode" id="zip" required>
+                                </div>
+                                <div class="form-group col-md-6" style="margin-left: 131px;">
+                                    <label for="inputOffice">Post Offie</label>
+                                    <input type="text" class="form-control" name="office" id="office" placeholder="Post Office" required>
+                                </div>
+                            </div>
+
+
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="inputCity">City</label>
+                                    <input type="text" class="form-control" name="city" id="city" placeholder="City" required>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="inputState">State</label>
+                                    <input type="text" class="form-control" name="state" id="state" placeholder="State" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-md ">Add</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+
+{% endblock %}
