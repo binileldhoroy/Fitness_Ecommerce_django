@@ -1,57 +1,117 @@
 {% extends 'dashboard_main.html' %}
 
 {% block dashboard %}
-<div class="row page-titles">
-    <div class="col-md-5 align-self-center">
-        <h3 class="text-themecolor">Dashboard</h3>
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
-            <li class="breadcrumb-item active">Dashboard</li>
-        </ol>
-    </div>
-</div>
-<div class="row">
-    <!-- Column -->
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex no-block">
-                    <div>
-                        <h5 class="card-title mb-0">Sales Chart</h5>
-                    </div>
-                    <div class="ms-auto">
-                        <ul class="list-inline text-center font-12">
-                            <li><i class="fa fa-circle text-success"></i> SITE A</li>
-                            <li><i class="fa fa-circle text-info"></i> SITE B</li>
-                            <li><i class="fa fa-circle text-primary"></i> SITE C</li>
-                        </ul>
-                    </div>
+
+<div class="col-md-10 col-12 mx-auto">
+    <div class="row">
+        <div class="col-md-6 col-12">
+            <div class="card" style="margin-top: 30px;">
+                <div class="card-body">
+                    <h4 style="text-align: center;">Order Details</h4>
+                    <canvas id="salescount" style="width: 300px; height: 300px;"></canvas>
                 </div>
-                <div class="" id="sales-chart" style="height: 355px;"></div>
+            </div>
+        </div>
+        <div class="col-md-6 col-12">
+            <div class="card" style="margin-top: 30px;">
+                <div class="card-body">
+                    <h4 style="text-align: center;">Payment Methods</h4>
+                    <canvas id="salesamount" style="width: 300px; height: 300px;"></canvas>
+                </div>
             </div>
         </div>
     </div>
-    <!-- Column -->
-    <div class="col-lg-4">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex mb-4 no-block">
-                    <h5 class="card-title mb-0 align-self-center">Our Visitors</h5>
-                    <div class="ms-auto">
-                        <select class="form-select b-0">
-                            <option selected="">Today</option>
-                            <option value="1">Tomorrow</option>
-                        </select>
-                    </div>
+    <div class="row">
+        <div class="col-md-12 col-12">
+            <div class="card" style="margin-top: 30px;">
+                <div class="card-body">
+                  <h4 style="text-align: center;">Products and Stocks</h4>
+                    <canvas id="salesyearcount" style="width: 300px; "></canvas>
                 </div>
-                <div id="visitor" style="height:260px; width:100%;"></div>
-                <ul class="list-inline mt-4 text-center font-12">
-                    <li><i class="fa fa-circle text-purple"></i> Tablet</li>
-                    <li><i class="fa fa-circle text-success"></i> Desktops</li>
-                    <li><i class="fa fa-circle text-info"></i> Mobile</li>
-                </ul>
             </div>
         </div>
+          
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const order = document.getElementById('salescount').getContext('2d');
+    var xValues = ['Approved','shipped','Delivered'];
+var yValues = {{count|safe}};
+var barColors = [
+  "#52D726",
+  "#FFEC00",
+  "#FF7300",
+];
+
+new Chart(order, {
+  type: "pie",
+  data: {
+    labels: xValues,
+    datasets: [{
+      backgroundColor: barColors,
+      data: yValues
+    }]
+  },
+  options: {
+    title: {
+      display: true,
+      text: "Order Details"
+    }
+  }
+});
+
+const pyamethod = document.getElementById('salesamount').getContext('2d');
+var xValues = ['COD','RazorPay','PayPal'];
+var yValues = {{paymethod|safe}};
+var barColors = [
+  "#FF0000",
+  "#007ED6",
+  "#7CDDDD"
+];
+
+new Chart(pyamethod, {
+  type: "doughnut",
+  data: {
+    labels: xValues,
+    datasets: [{
+      backgroundColor: barColors,
+      data: yValues
+    }]
+  },
+  options: {
+    title: {
+      display: true,
+      text: "Pyament Method"
+    }
+  }
+});
+
+
+
+const product = document.getElementById('salesyearcount').getContext('2d');
+var xValues = {{prod|safe}};
+var yValues = {{stock|safe}};
+var barColors = ["red", "#02a38b","#005ca5","orange","brown","#FFEC00","#7CDDDD","#f3a853","#9bd06d","#e086bd","#31397d"];
+
+new Chart(product, {
+  type: "bar",
+  data: {
+    labels: xValues,
+    datasets: [{
+      backgroundColor: barColors,
+      data: yValues
+    }]
+  },
+  options: {
+    legend: {display: false},
+    title: {
+      display: true,
+      text: "Product and Stock"
+    }
+  }
+});
+    </script>
+
+
 {% endblock %}

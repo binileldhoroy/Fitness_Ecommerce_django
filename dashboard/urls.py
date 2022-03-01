@@ -17,4 +17,10 @@ urlpatterns = [
     path('order-accept/<str:pk>',views.orderAccept,name='order-accept'),
     path('order-shipped/<str:pk>',views.orderShipped,name='order-shipped'),
     path('order-delivered/<str:pk>',views.orderDelivered,name='order-delivered'),
+    path('sales-report/',views.salesReport,name='sales-report'),
+    path('export-csv/',views.exportCsv,name='export-csv'),
+    path('export-excel/',views.exportExcel,name='export-excel'),
+    path('export-pdf/',views.exportPdf,name='export-pdf'),
+    path('add-coupon/',views.addCoupon,name='add-coupon'),
+
 ]

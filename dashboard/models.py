@@ -1,5 +1,6 @@
 from django.db import models
 from fitness.models import User,ShippingAddress
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Category(models.Model):
     name = models.CharField(max_length=100,null=True)
@@ -25,6 +26,17 @@ class Product(models.Model):
 
     def __str__(self):
         return self.product_name
+    
+
+class Coupon(models.Model):
+    code = models.CharField(max_length=6,unique=True,null=True)
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+    discount = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(100)])
+    active = models.BooleanField()
+
+    def __str__(self):
+        return self.code
 
 
 class Order(models.Model):
@@ -32,11 +44,12 @@ class Order(models.Model):
     order_status = models.BooleanField(default=False)
     date_ordered = models.DateTimeField(auto_now_add=True)
     address = models.ForeignKey(ShippingAddress,on_delete=models.SET_NULL, null=True, blank=True)
-    date = models.CharField(max_length=100,null=True)
+    date = models.DateTimeField(null=True)
     approve_status = models.BooleanField(default=False)
     shipped_status = models.BooleanField(default=False)
     cancel_status = models.BooleanField(default=False)
     delivery_status = models.BooleanField(default=False)
+    coupon = models.ForeignKey(Coupon,on_delete=models.SET_NULL,null=True, blank=True)
 
     class Meta:
         ordering = ('-date_ordered',)
@@ -47,7 +60,17 @@ class Order(models.Model):
     @property
     def get_cart_total(self):
         orderitem = self.orderitem_set.all()
-        total = sum([item.get_total for item in orderitem])
+        try:
+            code = self.coupon.discount
+            print(code)
+        except:
+            code = ''
+        if code == '':
+            total = sum([item.get_total for item in orderitem])
+        else:
+            total_dis = sum([item.get_total for item in orderitem])
+            total = total_dis - (total_dis * code / 100)
+        
         return total
     
     @property
@@ -79,3 +102,5 @@ class OrderItem(models.Model):
     def get_total(self):
         total = self.product.price * self.quantity
         return total
+
+

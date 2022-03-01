@@ -23,4 +23,7 @@ urlpatterns = [
     path('change-address/<str:pk>',views.changeAddress,name='change-address'),
     path('change-password/',views.MyPasswordChangeView.as_view(),name='change-password'),
     path('change-password/done',views.MyPasswordResetDoneView.as_view(),name='change-password-done'),
+    path('edit-profile/',views.editProfile,name='edit-profile'),
+    path('apply-coupon/',views.applyCoupon,name='apply-coupon'),
+    path('remove-coupon/<str:pk>',views.removeCoupon,name='remove-coupon'),
 ]

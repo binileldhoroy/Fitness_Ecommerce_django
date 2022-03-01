@@ -1,3 +1,4 @@
+from email.policy import default
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -6,6 +7,7 @@ from django.contrib.auth.models import AbstractUser
 class User(AbstractUser):
     phone = models.BigIntegerField(null=True,unique=True)
     adminstatus = models.BooleanField(blank=True,default=False,null=True)
+    biopic = models.ImageField(upload_to='images',null=True,default='images/avater.svg')
 
 
 class ShippingAddress(models.Model):

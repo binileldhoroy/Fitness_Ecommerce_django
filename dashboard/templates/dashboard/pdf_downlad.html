@@ -1,0 +1,31 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Order Id</th>
+            <th>Date</th>
+            <th>Payment Method</th>
+            <th>Items</th>
+            <th>Total Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        {% if order.payment.payment_status == True %}
+        <tr>
+            <td>
+                <p>#{{order.id}}</p>
+            </td>
+            <td>{{order.date}}</td>
+            <td>{{order.payment.payment_method}}</td>
+            <td>{{order.get_cart_items}}</td>
+            <td>{{order.payment.payment_amount}}</td>
+           </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

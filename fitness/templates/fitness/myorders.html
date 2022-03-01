@@ -6,21 +6,21 @@
     {% if order.get_cart_items >= 1 %}
     <div class="box-element mt-5">
         <div class="text-center p-2">
-            <h5>{{order.id}} Order Date:- {{order.date}} Items:- {{order.get_cart_items}}</h5>
+            <h5>Order Date:- {{order.date}} Items:- {{order.get_cart_items}}</h5>
         </div>
         <div class="container w-100 p-0 d-flex justify-content-end">
             {% if order.approve_status == False %}
                 {% if order.cancel_status == False %}
-                <a href="{% url 'order-cancel' order.id %}" class="btn btn-danger btn-block btn-sm m-1" style="width:80px!important;">Cancel</a>
+                <a href="{% url 'order-cancel' order.id %}" class="btn btn-danger btn-block btn-sm me-1" style="width:80px!important; margin-right: 40px;">Cancel</a>
                 {% else %}
-                <span class="btn btn-secondary">Order Canceled</span>
+                <span class="btn btn-secondary" style="margin-right: 40px;">Order Canceled</span>
                 {% endif %}
             {% else %}
                 {% if order.shipped_status == False %}
-                <span class="btn btn-success">Order Approved</span>
+                <span class="btn btn-success" style="margin-right: 40px;">Order Approved</span>
                 {% else %}
                 {% if order.delivery_status == False %}
-                <span class="btn btn-success">Order Shipped</span>
+                <span class="btn btn-success" style="margin-right: 40px;">Order Shipped</span>
                 {% endif %}
                 {% endif %}
             {% endif %}
@@ -36,7 +36,7 @@
                     <div style="flex:1"><p>{{item.quantity}}</p></div>
                     <div style="flex:1">
                         {% if order.delivery_status == True %}
-                            <span class="btn btn-success">Return</span>
+                            <span class="btn btn-success" style="margin-left: 50px;">Return</span>
                         {% endif %}
                     </div>
                 </div>
@@ -46,7 +46,7 @@
 
             
             
-            <span><b> Total:- {{order.get_cart_total}}</b></span>
+            <span><b> Total:- ₹ {{order.get_cart_total}}</b></span>
         </div>
     </div>
     {% endif %}

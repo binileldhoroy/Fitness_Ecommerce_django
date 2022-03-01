@@ -20,12 +20,12 @@ $(document).ready(function () {
                     console.log(response)
                     var options = {
                         "key": "rzp_test_kEoSfK4F37QHr9", // Enter the Key ID generated from the Dashboard
-                        "amount": response.cart_total, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                        "amount": response.cart_total * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
                         "currency": "INR",
                         "name": "Fitness Ecommerce",
                         "description": "Thanku for shopping with us",
                         "image": "https://example.com/your_logo",
-                        // "order_id": "order_9A33XWu170gUtm", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                        // "order_id": response.cur_order, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
                         "handler": function (response){
                             data = {
                                 'payment':payment,

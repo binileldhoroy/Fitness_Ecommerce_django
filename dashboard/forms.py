@@ -1,6 +1,6 @@
+from dataclasses import field
 from django.forms import ModelForm
-from django.contrib.auth.forms import UserCreationForm
-from .models import Product,Category
+from .models import Coupon, Product,Category
 class ProductForm(ModelForm):
     class Meta:
         model = Product
@@ -9,6 +9,11 @@ class ProductForm(ModelForm):
 class CategoryForm(ModelForm):
     class Meta:
         model = Category
+        fields = '__all__'
+
+class CouponForm(ModelForm):
+    class Meta:
+        model = Coupon
         fields = '__all__'
 
 

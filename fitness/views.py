@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render
 from django.contrib import messages
 from .models import *
 from .forms import *
-from dashboard.models import Product
+from dashboard.models import Coupon, Product
 from dashboard.models import Order, OrderItem, Payment, Product
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
@@ -15,7 +15,7 @@ from datetime import datetime
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordChangeView, PasswordResetDoneView
 import random
-import json
+
 # Create your views here.
 
 @never_cache
@@ -57,12 +57,12 @@ def otpLogin(request):
         otp_body = str(uname) + ' ' + str(otp)
 
         account_sid = config('account_sid') 
-        auth_token = config('auth_token') 
+        auth_token =  config('auth_token') 
         client = Client(account_sid, auth_token)
         print(auth_token)
         try:
             message = client.messages.create(  
-                                  messaging_service_sid=config('messaging_service_sid'), 
+                                  messaging_service_sid=config('messaging_service_sid'),  
                                   body= otp_body,
                                   from_='+19033296330',
                                   to='+91' + str(number)
@@ -252,7 +252,7 @@ def checkOut(request):
                 ).save()
                 order.address = add
                 now = datetime.now()
-                cur_date = now.strftime("%d/%m/%Y %H:%M:%S")
+                cur_date = now
                 order.date = cur_date
                 order.save()
                 Order.objects.filter(user=user).update(order_status = True)
@@ -305,6 +305,8 @@ def paymentComplete(request):
     return render(request,'fitness/paymentcomplete.html')
 
 
+@never_cache
+@login_required(login_url='login')
 def payRazorpay(request):
     if request.user.is_authenticated:
         user = request.user
@@ -322,6 +324,8 @@ def payRazorpay(request):
         })
 
 
+@never_cache
+@login_required(login_url='login')
 def razorpayComplete(request):
     if request.user.is_authenticated:
         user = request.user
@@ -347,7 +351,7 @@ def razorpayComplete(request):
 
         order.address = add
         now = datetime.now()
-        cur_date = now.strftime("%d/%m/%Y %H:%M:%S")
+        cur_date = now
         order.date = cur_date
         order.save()
         Order.objects.filter(user=user).update(order_status = True)
@@ -364,10 +368,14 @@ def razorpayComplete(request):
         return JsonResponse({'status':'Your order has placed successfully'}) 
 
 
+@never_cache
+@login_required(login_url='login')
 def myProfile(request):
     return render(request,'fitness/myprofile.html')
 
 
+@never_cache
+@login_required(login_url='login')
 def myAddress(request):
     if request.user.is_authenticated:
         form = AddressForm()
@@ -422,10 +430,43 @@ def changeAddress(request,pk):
         return render(request,'fitness/edit_address.html',context)
 
 
+def editProfile(request):
+    user = request.user
+    form = EditProfileForm(instance=user)
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST,request.FILES,instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('my-profile')
+    return render(request,'fitness/edit_profile.html',{'form':form})
 
 class MyPasswordChangeView(PasswordChangeView):
     template_name = 'fitness/change_password.html'
     success_url = reverse_lazy('change-password-done')
 
+
 class MyPasswordResetDoneView(PasswordResetDoneView):
     template_name = 'fitness/password_reset_done.html'
+
+
+def applyCoupon(request):
+    
+    code = request.POST.get('copoun')
+    try:
+        code = Coupon.objects.get(code = code)
+        user = request.user
+        order = Order.objects.filter(user = user,coupon = code).exists()
+        if order == False:
+            if request.method == 'POST':
+                Order.objects.filter(user = user,order_status=False).update(coupon = code)  
+        else:
+            messages.error(request,'Coupon Already Applyed')
+    except:
+        messages.error(request,'Invalid Coupon')
+    return redirect('check-out')
+
+
+def removeCoupon(request,pk):
+    user = request.user
+    Order.objects.filter(user = user,order_status=False,id = pk).update(coupon = '')
+    return redirect('check-out')

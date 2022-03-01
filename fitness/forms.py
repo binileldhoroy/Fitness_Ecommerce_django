@@ -1,4 +1,5 @@
 from dataclasses import fields
+from pyexpat import model
 from urllib import request
 from django import forms
 from django.forms import ModelForm
@@ -15,3 +16,10 @@ class AddressForm(ModelForm):
         model = ShippingAddress
         fields = '__all__'
         exclude = ['user']
+
+
+class EditProfileForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name','last_name','biopic']
+   

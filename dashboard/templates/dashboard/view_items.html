@@ -43,7 +43,7 @@
                     <a href="{% url 'order-shipped' order.id %}" class="btn btn-success btn-block btn-sm m-1">Ship Now</a>
                     {% else %}
                         {% if order.delivery_status == True %}
-                            <span   span class="btn btn-success">Order Shipped</span>
+                            <span   span class="btn btn-success">Order Delivered</span>
                         {% endif %}
                         {% if order.delivery_status == False %}
                             <a href="{% url 'order-delivered' order.id %}" class="btn btn-success btn-block btn-sm m-1">Delivered</a>

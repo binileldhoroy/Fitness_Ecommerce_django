@@ -1,0 +1,81 @@
+{% extends 'dashboard_main.html' %}
+
+{% block dashboard %}
+{% load static %}
+<div class="row">
+    <div class="col-md-12 col-12">
+        <div class="card" style="margin-top: 30px;">
+            <div class="card-body">
+              <form action="" method="POST" class="d-flex">
+                {% csrf_token %}
+                <label for="" class="ms-1">From</label>
+              <input type="date" name="sdate" class="seldate ms-1">
+              <label for="" class="ms-1">To</label>
+              <input type="date" name="edate" class="seldate ms-1">
+              <button type="submit" class="btn btn-outline-secondary btn-sm  ms-1">Search</button>
+              </form>
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" style="float:right; margin-right:5px;" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                  Download Report
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                  <li><a class="dropdown-item" href="{% url 'export-excel' %}">Excel</a></li>
+                  <li><button id="exp-id">pdf</button></li>
+                  <li><a class="dropdown-item"  href="{% url 'export-csv' %}">CSV</a></li>
+                </ul>
+              </div>
+              <br>
+              <table class="table table-striped" id="report-table">
+                <thead>
+                    <tr>
+                        <th>Order Id</th>
+                        <th>Date</th>
+                        <th>Payment Method</th>
+                        <th>Items</th>
+                        <th>Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    {% if order.payment.payment_status == True %}
+                    <tr>
+                        <td>
+                            <p>#{{order.id}}</p>
+                        </td>
+                        <td>{{order.date}}</td>
+                        <td>{{order.payment.payment_method}}</td>
+                        <td>{{order.get_cart_items}}</td>
+                        <td>{{order.payment.payment_amount}}</td>
+                       </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+                
+            </div>
+        </div>
+    </div>
+  </div>
+  <script src="{% static 'dashboard/js/html2pdf.bundle.min.js' %}"></script>
+  <script>
+  document.getElementById('exp-pdf').onclick = function(){
+    var element = document.getElementById('report-table');
+    var opt = {
+      margin:       1,
+      filename:     'myfile.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    
+    html2pdf(element,opt)
+  };
+</script>
+<script>
+  $(document).ready(function () {
+    var date = new Date().toISOString().slice(0,10)
+    $('.seldate').attr('max',date)
+  });
+</script>
+
+{% endblock %}
