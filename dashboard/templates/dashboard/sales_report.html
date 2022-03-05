@@ -2,30 +2,50 @@
 
 {% block dashboard %}
 {% load static %}
+
 <div class="row">
     <div class="col-md-12 col-12">
         <div class="card" style="margin-top: 30px;">
             <div class="card-body">
-              <form action="" method="POST" class="d-flex">
+              <form action="" method="POST" >
                 {% csrf_token %}
-                <label for="" class="ms-1">From</label>
-              <input type="date" name="sdate" class="seldate ms-1">
-              <label for="" class="ms-1">To</label>
-              <input type="date" name="edate" class="seldate ms-1">
-              <button type="submit" class="btn btn-outline-secondary btn-sm  ms-1">Search</button>
+                <div class="d-flex">
+                  <label for="" class="ms-1">From</label>
+                  <input type="date" name="sdate" class="seldate ms-1">
+                  <label for="" class="ms-1">To</label>
+                  <input type="date" name="edate" class="seldate ms-1">
+                </div>
+                <div class="mt-3">
+                  <p style="margin-left: 100px;" >OR</p>
+                </div>
+                <div class="mt-3">
+                  
+                  <label for="" class="ms-1">Select Month</label>
+                  <input type="month" name="month" class="seldate ms-1">
+                  
+                  <label for="cars">Year</label>
+                  
+                  <select name="year">
+                    <option value="">------</option>
+                    {% for y in yr %}
+                    <option value="{{y}}">{{y}}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn btn-outline-secondary btn-md ms-2 mb-1">Search</button>
+                </div>
               </form>
               <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle" style="float:right; margin-right:5px;" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                   Download Report
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                  <li><a class="dropdown-item" href="{% url 'export-excel' %}">Excel</a></li>
-                  <li><button id="exp-id">pdf</button></li>
-                  <li><a class="dropdown-item"  href="{% url 'export-csv' %}">CSV</a></li>
+                  <li><a class="dropdown-item" class="btn btn-sm" href="{% url 'export-excel' %}">Excel</a></li>
+                  <li > <button id="exppdf" class="btn btn-sm ms-2"> PDF</button></li>
+                  <li><a class="dropdown-item" class="btn btn-sm"  href="{% url 'export-csv' %}">CSV</a></li>
                 </ul>
               </div>
               <br>
-              <table class="table table-striped" id="report-table">
+              <table class="table table-striped" id="reporttable">
                 <thead>
                     <tr>
                         <th>Order Id</th>
@@ -58,23 +78,26 @@
   </div>
   <script src="{% static 'dashboard/js/html2pdf.bundle.min.js' %}"></script>
   <script>
-  document.getElementById('exp-pdf').onclick = function(){
-    var element = document.getElementById('report-table');
+  document.getElementById('exppdf').onclick = function(){
+    var date = new Date().toISOString().slice(0,19);
+    console.log(date)
+    var element = document.getElementById('reporttable');
     var opt = {
       margin:       1,
-      filename:     'myfile.pdf',
+      filename:     'SalesReport'+ date +'.pdf',
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 2 },
       jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
     
-    html2pdf(element,opt)
+    html2pdf(element, opt)
   };
 </script>
 <script>
   $(document).ready(function () {
     var date = new Date().toISOString().slice(0,10)
     $('.seldate').attr('max',date)
+
   });
 </script>
 

@@ -1,44 +1,72 @@
 {% extends 'main.html' %}
 
 {% block content %}
-
+{% load static %}
+<script type="text/javascript" src="{% static 'fitness/js/product-filter.js' %}"></script>
+<!-- <img src="{% static 'fitness/images/DoubleRing.gif' %}" style="background: no-repeat; background: center;" alt="" id="loader"> -->
 <section class="banner-bottom py-5">
-    <div class="container py-5">
+    <div class=" container-fluid py-5">
         <h3 class="title-wthree mb-lg-5 mb-4 text-center">Shop Now</h3>
-        <!--/row-->
-        <div class="row shop-wthree-info text-center">
-            {% for product in products %}
-            <div class="col-lg-3 shop-info-grid text-center mt-4">
-                <div class="product-shoe-info shoe">
-                    
-                    <div class="men-thumb-item">
-                        <img src="{{product.image1.url}}" class="img-fluid" style="height: 150px;" alt="">
+<div class="row">
+    <div class="col-md-3">
+        <div class="card mt-4">
 
-                    </div>
-                    <div class="item-info-product">
-                        <h4>
-                            <a href="{% url 'product'  product.id %}">{{product.product_name|slice:":30"}}</a><small style="font-size: 12px;">more..</small>
-                        </h4>
-                        <div class="available mt-3">
-                            <p>{{product.category.name}} </p>
-                        </div>
-                        <div class="product_price">
-                            <!-- <p>
-                                {{product.name}} 
-                            </p> -->
-                            <div class="grid-price">
-                                <span class="money"> {{product.price | floatformat:2}}₹</span>
-                                <a href="{% url 'product' product.id %}" class="btn btn-info btn-view btn-block btn-sm m-1">View</a>
+
+            <div class="card mb-4">
+				<h6 class="card-header">Categories</h6>
+				<div class="list-group list-group-flush">
+					{% for cat in cats %}
+					<li class="list-group-item">
+						<input class="filter-checkbox" data-filter="category" value="{{cat.id}}" type="checkbox" />&nbsp;
+						{{cat.name}}
+					</li>
+					{% endfor %}
+				</div>
+			</div>
+        </div>
+    </div>
+    <div class="col-md-9">
+
+                <!--/row-->
+                <div class="row shop-wthree-info text-center" id="filterproducts" >
+                    {% for product in products %}
+                    <div class="col-lg-3 shop-info-grid text-center mt-4" >
+                        <div class="product-shoe-info shoe">
+                            
+                            <div class="men-thumb-item">
+                                <img src="{{product.image1.url}}" class="img-fluid" style="height: 150px;" alt="">
+        
+                            </div>
+                            <div class="item-info-product">
+                                <h4>
+                                    <a href="{% url 'product'  product.id %}">{{product.product_name|slice:":25"}}</a><small style="font-size: 12px;">more..</small>
+                                </h4>
+                                <div class="available mt-3">
+                                    <p>{{product.category.name}} </p>
+                                </div>
+                                <div class="product_price">
+                                    <!-- <p>
+                                        {{product.name}} 
+                                    </p> -->
+                                    <div class="grid-price">
+                                        <span class="money"> {{product.product_discount_price| floatformat:2}}₹</span>
+                                        {% if product.price > product.product_discount_price %}
+                                        <strike class="money"> {{product.price | floatformat:2}}₹</strike>
+                                        {% endif %}
+                                        <a href="{% url 'product' product.id %}" class="btn btn-info btn-view btn-block btn-sm m-1">View</a>
+                                    </div>
+                                </div>
+                                
                             </div>
                         </div>
-                        
                     </div>
+                    {% endfor %}
                 </div>
+                
             </div>
-            {% endfor %}
         </div>
-        
     </div>
 </section>
+
 
 {% endblock %}

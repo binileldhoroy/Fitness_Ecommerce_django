@@ -34,7 +34,7 @@
             <div class="cart-row" id="{{item.product.id}}">
                 <div style="flex:2"><img class="row-image" src="{{ item.product.image1.url }}"></div>
                 <div style="flex:2"><p style=" margin-top: 15px;">{{item.product.product_name}}</p></div>
-                <div style="flex:1"><p style=" margin-top: 15px;">₹{{item.product.price|floatformat:2}}</p></div>
+                <div style="flex:1"><p style=" margin-top: 15px;">₹{{item.product.product_discount_price}}</p></div>
                 <div style="flex:1">
                     <p class="quantity" id="quantity">x {{item.quantity}}</p>
                     <div class="quantity" style=" margin-top: 10px;">
@@ -97,9 +97,9 @@ console.log(action)
         var cart_total_id = " #cart_total"
         var quantity_id = '#' + productId + " #quantity"
        
-        $(total_id).html(total + '.00')
+        $(total_id).html(total.toFixed(2))
         $(item_id).html(items )
-        $(cart_total_id).html('₹' + cart_total + '.00')
+        $(cart_total_id).html('₹' + cart_total.toFixed(2))
         $(quantity_id).html('x ' + quantity)
         $('#cart_items').html(items)
        

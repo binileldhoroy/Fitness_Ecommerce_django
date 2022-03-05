@@ -13,6 +13,7 @@ from datetime import datetime
 import csv
 import xlwt
 from django.template.loader import get_template
+import calendar
 
 # Create your views here.
 @never_cache
@@ -125,56 +126,70 @@ def addProduct(request):
 @never_cache
 @login_required(login_url='admin-login')
 def viewProduct(request):
-    products = Product.objects.all()
+    if request.user.username == 'binil':
+        products = Product.objects.all()
+    else:
+        return redirect('login')
     return render(request,'dashboard/view_product.html',{'products':products})
 
 
 @never_cache
 @login_required(login_url='admin-login')
 def editProduct(request,pk):
-    product = Product.objects.get(id=pk)
-    form = ProductForm(instance=product)
-    if request.method == 'POST':
-        form = ProductForm(request.POST,instance=product)
-        if form.is_valid():
-            form.save()
-            messages.success(request,'Update Successfully')
-            return redirect('view-product')
+    if request.user.username == 'binil':
+        product = Product.objects.get(id=pk)
+        form = ProductForm(instance=product)
+        if request.method == 'POST':
+            form = ProductForm(request.POST,instance=product)
+            if form.is_valid():
+                form.save()
+                messages.success(request,'Update Successfully')
+                return redirect('view-product')
+    else:
+        return redirect('login')
     return render(request,'dashboard/edit_product.html',{'form':form})
 
 
 @never_cache
 @login_required(login_url='admin-login')
 def deleteProduct(request,pk):
-    product = Product.objects.get(id=pk)
-    if request.method == 'POST':
-        product.delete()
-        return redirect('view-product')
+    if request.user.username == 'binil':
+        product = Product.objects.get(id=pk)
+        if request.method == 'POST':
+            product.delete()
+            return redirect('view-product')
+    else:
+        return redirect('login')
     return render(request,'dashboard/delete_product.html')
 
 @never_cache
 @login_required(login_url='admin-login')
 def addCategory(request):
-    form = CategoryForm()
-    if request.method == 'POST':
-        category = request.POST.get('name')
-        Category.objects.get_or_create(name=category)
-        messages.success(request,'Cateory is Added')
-        return redirect('add-category')
+    if request.user.username == 'binil':
+        form = CategoryForm()
+        if request.method == 'POST':
+            category = request.POST.get('name')
+            Category.objects.get_or_create(name=category)
+            messages.success(request,'Cateory is Added')
+            return redirect('add-category')
+        else:
+            return render(request,'dashboard/dash_addproduct.html',{'form':form})
     else:
-        return render(request,'dashboard/dash_addproduct.html',{'form':form})
-
+        return redirect('login')
 
 
 @never_cache
 @login_required(login_url='admin-login')
 def viewOrders(request):
-    if request.user.is_authenticated:
-        orders = Order.objects.all().filter(order_status=True)
+    if request.user.username == 'binil':
+        if request.user.is_authenticated:
+            orders = Order.objects.all().filter(order_status=True)
+        else:
+            messages.error(request,'Empty Orders')
+            return render(request,'dashboard/view_orders.html')
+        context = {'orders':orders}
     else:
-        messages.error(request,'Empty Orders')
-        return render(request,'dashboard/view_orders.html')
-    context = {'orders':orders}    
+        return redirect('login')  
 
     return render(request,'dashboard/view_orders.html',context)
 
@@ -182,13 +197,16 @@ def viewOrders(request):
 @never_cache
 @login_required(login_url='admin-login')
 def orderItemView(request,pk):
-    if request.user.is_authenticated:
-        order = Order.objects.get(id=pk)
-        items = order.orderitem_set.all()
+    if request.user.username == 'binil':
+        if request.user.is_authenticated:
+            order = Order.objects.get(id=pk)
+            items = order.orderitem_set.all()
+        else:
+            messages.error(request,'Something went wrong')
+            return render(request,'dashboard/view_items.html')
+        context = {'order':order,'items':items} 
     else:
-        messages.error(request,'Something went wrong')
-        return render(request,'dashboard/view_items.html')
-    context = {'order':order,'items':items}    
+        return redirect('login')   
 
     return render(request,'dashboard/view_items.html',context)
 
@@ -196,65 +214,90 @@ def orderItemView(request,pk):
 @never_cache
 @login_required(login_url='admin-login')
 def orderAccept(request,pk):
-    if request.user.is_authenticated:
-        Order.objects.filter(id=pk).update(approve_status=True)
-        order = Order.objects.get(id=pk)
-        items = order.orderitem_set.all()
+    if request.user.username == 'binil':
+        if request.user.is_authenticated:
+            Order.objects.filter(id=pk).update(approve_status=True)
+            order = Order.objects.get(id=pk)
+            items = order.orderitem_set.all()
+        else:
+            messages.error(request,'Something went wrong')
+            return render(request,'dashboard/view_items.html')
+        context = {'order':order,'items':items}
     else:
-        messages.error(request,'Something went wrong')
-        return render(request,'dashboard/view_items.html')
-    context = {'order':order,'items':items}
-        
+        return redirect('login')  
     return render(request,'dashboard/view_items.html',context)
 
 
 @never_cache
 @login_required(login_url='admin-login')
 def orderShipped(request,pk):
-    if request.user.is_authenticated:
-        Order.objects.filter(id=pk).update(shipped_status=True)
-        order = Order.objects.get(id=pk)
-        items = order.orderitem_set.all()
+    if request.user.username == 'binil':
+        if request.user.is_authenticated:
+            Order.objects.filter(id=pk).update(shipped_status=True)
+            order = Order.objects.get(id=pk)
+            items = order.orderitem_set.all()
+        else:
+            messages.error(request,'Something went wrong')
+            return render(request,'dashboard/view_items.html')
+        context = {'order':order,'items':items}
     else:
-        messages.error(request,'Something went wrong')
-        return render(request,'dashboard/view_items.html')
-    context = {'order':order,'items':items}
-        
+        return redirect('login')        
     return render(request,'dashboard/view_items.html',context)
 
 
 @never_cache
 @login_required(login_url='admin-login')
 def orderDelivered(request,pk):
-    if request.user.is_authenticated:
-        Order.objects.filter(id=pk).update(delivery_status=True)
-        order = Order.objects.get(id=pk)
-        items = order.orderitem_set.all()
-        payment = Payment.objects.filter(order=order).update(payment_status=True)
-        print(payment)
+    if request.user.username == 'binil':
+        if request.user.is_authenticated:
+            Order.objects.filter(id=pk).update(delivery_status=True)
+            order = Order.objects.get(id=pk)
+            items = order.orderitem_set.all()
+            payment = Payment.objects.filter(order=order).update(payment_status=True)
+            print(payment)
+        else:
+            messages.error(request,'Something went wrong')
+            return render(request,'dashboard/view_items.html')
+        context = {'order':order,'items':items}
     else:
-        messages.error(request,'Something went wrong')
-        return render(request,'dashboard/view_items.html')
-    context = {'order':order,'items':items}
-        
+        return redirect('login')    
     return render(request,'dashboard/view_items.html',context)
 
 
 @never_cache
 @login_required(login_url='admin-login')
 def salesReport(request):
-    
-    global orders
-    orders = Order.objects.filter(payment__payment_status=True)
+    if request.user.username == 'binil':
+        global orders
+        num = 2000
+        yr = []
+        for i in range(50):
+            yr.append(num+i)
+        orders = Order.objects.filter(payment__payment_status=True)
+        if request.method == 'POST':
+            s_date = request.POST.get('sdate')
+            e_date = request.POST.get('edate')
+            month = request.POST.get('month')
+            year = request.POST.get('year')
+            print(year)
+            if month != '':
+                m = int(month[5:])
+                orders = orders.filter(date__month=m).filter(payment__payment_status=True)
+                print(orders)
+            elif year != '':
+                y = int(year)
+                orders = orders.filter(date__year=y).filter(payment__payment_status=True)
+            elif s_date == '' and e_date == '' and month == '' and year == '':
+                messages.error(request,'Select a date')
+                return redirect('sales-report')
+            else:
+                orders = orders.filter(date__range=[s_date,e_date]).filter(payment__payment_status=True)
+            context = {'orders':orders,'yr':yr}
+            return render(request,'dashboard/sales_report.html',context)
 
-    if request.method == 'POST':
-        s_date = request.POST.get('sdate')
-        e_date = request.POST.get('edate')
-        orders = orders.filter(date__range=[s_date,e_date]).filter(payment__payment_status=True)
-        context = {'orders':orders}
-        return render(request,'dashboard/sales_report.html',context)
-
-    context = {'orders':orders}
+        context = {'orders':orders,'yr':yr}
+    else:
+        return redirect('login')
     return render(request,'dashboard/sales_report.html',context)
 
 
@@ -330,12 +373,15 @@ def exportPdf(request):
 
 
 def addCoupon(request):
-    form = CouponForm()
-    coupons = Coupon.objects.all()
-    if request.method == 'POST':
-        form = CouponForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('add-coupon')
-    context = {'form':form,'coupons':coupons}
+    if request.user.username == 'binil':
+        form = CouponForm()
+        coupons = Coupon.objects.all()
+        if request.method == 'POST':
+            form = CouponForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('add-coupon')
+        context = {'form':form,'coupons':coupons}
+    else:
+        return redirect('login')
     return render(request,'dashboard/add_coupon.html',context)

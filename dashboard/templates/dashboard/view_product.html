@@ -37,9 +37,17 @@
                                     <p>{{product.product_name}}</p>
                                 </td>
                                 <td>{{product.description|slice:":50"}}</td>
-                                <td>{{product.price}}</td>
+                                <td>{{product.price}}
+                                    {% if product.product_discount > 0 %}
+                                    <p style="color: rgb(241, 87, 87);">Discount {{product.product_discount}}%</p>
+                                    {% endif %}
+                                </td>
                                 <td>{{product.size}}</td>
-                                <td>{{product.category}}</td>
+                                <td>{{product.category}}
+                                    {% if product.category.category_discount > 0 %}
+                                    <p style="color: rgb(241, 87, 87);">Discount  {{product.category.category_discount}}%</p>
+                                    {% endif %}
+                                </td>
                                 <td>{{product.stock}}</td>
                                 <td>
                                     <a href="{% url 'edit-product' product.id %}" class="btn btn-success btn-block btn-sm m-1">Edit</a>

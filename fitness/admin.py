@@ -4,3 +4,4 @@ from .models import *
 
 admin.site.register(User)
 admin.site.register(ShippingAddress)
+admin.site.register(Referral)

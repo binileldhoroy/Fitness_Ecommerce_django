@@ -1,20 +1,23 @@
+import json
+from urllib import response
 from django.shortcuts import redirect, render
 from django.contrib import messages
 from .models import *
 from .forms import *
-from dashboard.models import Coupon, Product
+from dashboard.models import Category, Coupon, Product
 from dashboard.models import Order, OrderItem, Payment, Product
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
-from django.views.decorators.cache import never_cache   
+from django.views.decorators.cache import never_cache
 from django.http import JsonResponse
-from decouple import config
 from datetime import datetime 
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordChangeView, PasswordResetDoneView
-import random
+from .otp import *
+from django.template.loader import render_to_string
+from django.db.models import Q
 
 # Create your views here.
 
@@ -24,6 +27,8 @@ def loginView(request):
     if request.user.is_authenticated:
         return redirect('home')
     if request.method == 'POST':
+        not_active = User.objects.filter(is_active=False)
+        not_active.delete()
         uname = request.POST.get('username')
         password = request.POST.get('password')
         try:
@@ -44,64 +49,56 @@ def loginView(request):
 
 @never_cache
 def otpLogin(request):
-    global otp,number
+    global phone
     if request.method == 'POST':
-        number = request.POST.get('mobnumber')
+        phone = request.POST.get('mobnumber')
+        number = '+91' + str(phone)
+        user = None
         try:
-            user = User.objects.get(phone=number)
+            user = User.objects.get(phone=phone)
         except:
-            messages.error(request,'Account does not exits with this number')
+            
+            messages.error(request,"There is no user with this phone number")
+            return render(request, 'fitness/login.html',)
+        if user is not None:
+            try:
+                status = otp_login_code(request,number)
+            except TwilioRestException as e:
+                messages.error(request,e)
+            return redirect('otp-verify')
+    return render(request, 'fitness/login.html')
 
-        otp = random.randrange(11111,99999)
-        uname = user.first_name
-        otp_body = str(uname) + ' ' + str(otp)
-
-        account_sid = config('account_sid') 
-        auth_token =  config('auth_token') 
-        client = Client(account_sid, auth_token)
-        print(auth_token)
-        try:
-            message = client.messages.create(  
-                                  messaging_service_sid=config('messaging_service_sid'),  
-                                  body= otp_body,
-                                  from_='+19033296330',
-                                  to='+91' + str(number)
-                              ) 
-        except TwilioRestException as e:
-            messages.error(request,"Something went wrong " + repr(e.msg))
-
-        return redirect('otp-verify')
-    return render(request,'fitness/login.html')
 
 @never_cache
 def otpVerify(request):
-    try:
-        send_otp = otp
-    except:
-        return redirect('otp-login')
-    print(send_otp)
-    recv_number = number
     if request.method == 'POST':
-        user_otp = request.POST.get('otp')
-        if str(send_otp) == user_otp:
+        otp = request.POST.get('otp')
+        if len(str(otp)) < 4 or len(str(otp)) > 10 :
+            messages.error(request,"Invalid Entry")
+        else:
+            user = User.objects.get(phone= phone)
+            username = user.username
+            number = '+91' + str(phone)
             try:
-                user = User.objects.get(phone=recv_number)
-            except:
-                messages.error(request,'Account does not exits with this number')
-            if user.adminstatus == False: 
-                if user is not None:
+                status = otp_verify_code(request,number,otp)
+            except TwilioRestException as e:
+                messages.error(request,e)
+            if status == 'approved':
+                if user.adminstatus == False :
                     login(request,user)
-                    if request.user.is_authenticated:
-                        print("authenticated")
+                   
                     return redirect('home')
                 else:
-                    messages.error(request,'invalid username/password')
+                    messages.error(request,"You seems blocked try again later")
             else:
-                messages.error(request,'You are blocked by Admin')
-        else:
-            messages.error(request,'Incorrect OTP')
-
+                
+                messages.error(request,"Incorrect OTP ")
+                return render(request, 'fitness/otpverify.html')
+    else :
+        messages.success(request,"OTP has been sent to : "+ phone)
     return render(request,'fitness/otpverify.html')
+
+
 
 @never_cache
 def logoutView(request):
@@ -109,39 +106,137 @@ def logoutView(request):
     return redirect('home')
 
 @never_cache
-def signupView(request):
+def signupView(request, *args, **kwargs):
+    not_active = User.objects.filter(is_active=False)
+    not_active.delete()
     form = MyUserForm()
+    code = kwargs.get('ref_code')
+    print(code)
+    try:
+        profile = Referral.objects.get(ref_code=code)
+        request.session['ref_profile'] = profile.user.id
+    except:
+        pass
     if request.method == 'POST':
+        try:
+            profile_id = request.session.pop('ref_profile')
+        except:
+            profile_id = None
+        print(profile_id)
         form = MyUserForm(request.POST)
         if form.is_valid():
-            uphone = request.POST.get('phone')
-            c_phone = User.objects.filter(phone=uphone)
-            print(uphone)
-            if uphone in c_phone:
-                messages.error(request,'Account exists with this phone')
-                return redirect('signup')
+            if profile_id is not None:
+                recommended_by_profile = User.objects.get(id=profile_id)
+                uphone = request.POST.get('phone')
+                username = request.POST.get('username')
+                phone_number = '+91' + str(uphone)
+                c_phone = User.objects.filter(phone=uphone)
+                if uphone in c_phone:
+                    messages.error(request,'Account exists with this phone')
+                    return redirect('signup')
+                else:
+                    request.session['phone_number'] = phone_number
+                    user = form.save(commit=False)
+                    user.is_active = False
+                    user.username = user.username.lower()
+                    user.save()
+                    
+                    reg_user = User.objects.get(username=username)
+                    user_ref = Referral.objects.get(user=reg_user)
+                    user_ref.recommended_by = recommended_by_profile
+                    user_ref.save()
+                    try:
+                        status = otp_login_code(request,phone_number)
+                        return redirect('otp-verify-signup')
+                    except TwilioRestException as e:
+                        messages.error(request,e)
+                    
             else:
-                user = form.save(commit=False)
-                user.username = user.username.lower()
-                user.save()
-                login(request,user)
-                return redirect('home')
+                uphone = request.POST.get('phone')
+                request.session['phone_number'] = uphone
+                phone_number = '+91' + str(uphone)
+                c_phone = User.objects.filter(phone=uphone)
+                if uphone in c_phone:
+                    messages.error(request,'Account exists with this phone')
+                    return redirect('signup')
+                else:
+                    user = form.save(commit=False)
+                    user.is_active = False
+                    user.username = user.username.lower()
+                    user.save()
+                    try:
+                        status = otp_login_code(request,phone_number)
+                        return redirect('otp-verify-signup')
+                    except TwilioRestException as e:
+                        messages.error(request,e)
         else:
             messages.error(request,'SignUp Failed')
     context = {'form':form}
     return render(request,'fitness/signup.html',context)
 
+
+@never_cache
+def otpVerifySignUp(request):
+    if request.method == 'POST':
+        otp = request.POST.get('otp')
+        if len(str(otp)) < 4 or len(str(otp)) > 10 :
+            messages.error(request,"Invalid Entry")
+        else:
+            try:
+                phone_number = request.session.pop('phone_number')
+            except:
+                messages.error(request,'SignUp Faild')
+                return redirect('signup')
+            
+            number = '+91' + str(phone_number)
+            try:
+                status = None
+                status = otp_verify_code(request,number,otp)
+            except TwilioRestException as e:
+                messages.error(request,e)
+            if status == 'approved':
+                user = User.objects.get(phone= phone_number)
+                user.is_active = True
+                user.save()
+                login(request,user)
+                return redirect('home')
+            else:
+                
+                messages.error(request,"Incorrect OTP ")
+                return render(request, 'fitness/otp_verify_signup.html')
+    else :
+        messages.success(request,"OTP has been sent")
+    return render(request,'fitness/otp_verify_signup.html')
+
+
 @never_cache
 def home(request):
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
     if request.user.is_authenticated:
         user = request.user
         order, created  = Order.objects.get_or_create(user = user,order_status=False)
         items = order.orderitem_set.all()
     else:
         order = []
-    products = Product.objects.all()
-    context = {'products':products,'order':order}
+
+    cats = Category.objects.all()
+    products = Product.objects.filter(
+        Q(product_name__icontains=q)|
+        Q(description__icontains=q)|
+        Q(category__name__icontains=q)
+    )
+    context = {'products':products,'order':order,'cats':cats}
     return render(request,'fitness/home.html',context)
+
+
+def filterData(request):
+    category = request.GET.getlist('category[]')
+    products  = Product.objects.all().order_by('-id').distinct()
+    if len(category) > 0:
+        products = products.filter(category__id__in=category).distinct()
+    t = render_to_string('fitness/product-list.html',{'products':products})
+    return JsonResponse({'data':t})
+
 
 @never_cache
 @login_required(login_url='login')
@@ -226,18 +321,29 @@ def checkOut(request):
         user = request.user
         order, created  = Order.objects.get_or_create(user = user,order_status=False)
         items = order.orderitem_set.all()
+        coupon = Coupon.objects.all()
+        ref = Referral.objects.get(user=user)
+        ref_count = Referral.objects.filter(user=user).count()
+        print(ref)
+        try:
+            ref_user = ref.recommended_by
+            if ref_user is None:
+                ref_user = ''
+        except:
+            ref_user = ''
+        print('....',ref_user)
         address = user.shippingaddress_set.all()
         if request.method == 'POST':
             cur_address = request.POST.get('adrress')
-            p_method = request.POST.get('payment')
-            print(p_method)
+            # p_method = request.POST.get('payment')
+            # print(p_method)
 
-            if p_method == 'cod':
-                p_status = False
-            elif p_method == 'paypal':
-                p_status = True
+            # if p_method == 'cod':
+            #     p_status = False
+            # elif p_method == 'paypal':
+            #     p_status = True
 
-            if cur_address == None or p_method == None:
+            if cur_address == None:
                 messages.error(request,'Select Address')
                 return redirect('check-out')
             else:
@@ -246,8 +352,8 @@ def checkOut(request):
                 total = order.get_cart_total
                 Payment(
                     order = cur_order,
-                    payment_method = p_method,
-                    payment_status = p_status,
+                    payment_method = 'cod',
+                    payment_status = False,
                     payment_amount = total
                 ).save()
                 order.address = add
@@ -262,15 +368,12 @@ def checkOut(request):
                     product_stock = item.product.stock
                     product_id = item.product.id
                     stock_updated = product_stock - item_quantity
-                    Product.objects.filter(id = product_id).update(stock = stock_updated) 
-                
-                if p_method == 'paypal':
-                    return JsonResponse({'status':'Your order has placed successfully'})
+                    Product.objects.filter(id = product_id).update(stock = stock_updated)
 
                 return redirect('payment-complete')
 
         
-    context = {'items':items,'order':order,'useraddress':address,'page':page}
+    context = {'items':items,'order':order,'useraddress':address,'page':page,'coupons':coupon,'ref_user':ref_user,'ref_count':ref_count}
     return render(request,'fitness/checkout.html',context)
 
 
@@ -334,9 +437,9 @@ def razorpayComplete(request):
         items = order.orderitem_set.all()
 
         cur_address = request.POST.get('cur_address')
-        p_method = request.POST.get('payment')
+        # p_method = request.POST.get('payment')
         print(cur_address)
-        print(p_method)
+        # print(p_method)
         address = user.shippingaddress_set.all()
         cur_order = Order.objects.get(id=order.id)
         add = ShippingAddress.objects.get(id=cur_address)
@@ -344,7 +447,7 @@ def razorpayComplete(request):
 
         Payment(
             order = cur_order,
-            payment_method = p_method,
+            payment_method = 'razorpay',
             payment_status = True,
             payment_amount = total
         ).save()
@@ -362,7 +465,7 @@ def razorpayComplete(request):
             product_id = item.product.id
             stock_updated = product_stock - item_quantity
             Product.objects.filter(id = product_id).update(stock = stock_updated)
-        print(p_method)
+        # print(p_method)
         print(add)
     
         return JsonResponse({'status':'Your order has placed successfully'}) 
@@ -371,7 +474,9 @@ def razorpayComplete(request):
 @never_cache
 @login_required(login_url='login')
 def myProfile(request):
-    return render(request,'fitness/myprofile.html')
+    user = request.user
+    referral = Referral.objects.get(user=user)
+    return render(request,'fitness/myprofile.html',{'referral':referral})
 
 
 @never_cache
@@ -430,6 +535,8 @@ def changeAddress(request,pk):
         return render(request,'fitness/edit_address.html',context)
 
 
+@never_cache
+@login_required(login_url='login')
 def editProfile(request):
     user = request.user
     form = EditProfileForm(instance=user)
@@ -449,6 +556,9 @@ class MyPasswordResetDoneView(PasswordResetDoneView):
     template_name = 'fitness/password_reset_done.html'
 
 
+
+@never_cache
+@login_required(login_url='login')
 def applyCoupon(request):
     
     code = request.POST.get('copoun')
@@ -466,6 +576,8 @@ def applyCoupon(request):
     return redirect('check-out')
 
 
+@never_cache
+@login_required(login_url='login')
 def removeCoupon(request,pk):
     user = request.user
     Order.objects.filter(user = user,order_status=False,id = pk).update(coupon = '')

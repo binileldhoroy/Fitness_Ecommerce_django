@@ -32,7 +32,10 @@
     </div>
                 <div class="desc1-right col-md-6 pl-lg-3" id="{{product.id}}">
                     <h3>{{product.product_name}}</h3>
-                    <h5>Rs. {{product.price | floatformat:2}}</h5>
+                    {% if product.price > product.product_discount_price %}
+                        <strike class="money"> {{product.price | floatformat:2}}₹</strike>
+                    {% endif %}
+                    <h5>Rs. {{product.product_discount_price | floatformat:2}}₹</h5>
                     <div class="available mt-3">
                         <p>{{product.category.name}} </p>
                     </div>
@@ -78,7 +81,10 @@
 
                             <div class="product_price">
                                 <div class="grid-price">
-                                    <span class="money"> {{re_product.price | floatformat:2}}₹</span>
+                                    {% if re_product.price > re_product.product_discount_price %}
+                                        <strike class="money"> {{re_product.price | floatformat:2}}₹</strike>
+                                    {% endif %}
+                                    <span class="money"> {{re_product.product_discount_price| floatformat:2}}₹</span>
                                     <a href="{% url 'product' re_product.id %}" class="btn btn-info btn-view btn-block btn-sm m-1">View</a>
                                 </div>
                             </div>

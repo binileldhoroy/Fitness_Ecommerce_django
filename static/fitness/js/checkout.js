@@ -28,7 +28,7 @@ $(document).ready(function () {
                         // "order_id": response.cur_order, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
                         "handler": function (response){
                             data = {
-                                'payment':payment,
+                                'payment':'razorpay',
                                 'cur_address':address_id,
                                 csrfmiddlewaretoken : token
                             }

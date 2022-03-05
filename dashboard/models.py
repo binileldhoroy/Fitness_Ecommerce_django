@@ -1,9 +1,11 @@
+import re
 from django.db import models
 from fitness.models import User,ShippingAddress
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Category(models.Model):
     name = models.CharField(max_length=100,null=True)
+    category_discount = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(100)],null=True)
 
     def __str__(self):
         return self.name
@@ -18,6 +20,7 @@ class Product(models.Model):
     image3 = models.ImageField(upload_to='images',blank=True ,null=True)
     category = models.ForeignKey(Category,on_delete=models.SET_NULL,null=True)
     stock = models.PositiveBigIntegerField(default=0,null=True)
+    product_discount = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(100)],null=True)
     update = models.DateTimeField(auto_now=True,null=True)
     created = models.DateTimeField(auto_now_add=True,null=True)
 
@@ -26,13 +29,34 @@ class Product(models.Model):
 
     def __str__(self):
         return self.product_name
+
+    @property
+    def product_discount_price(self):
+        cat = self.category.category_discount
+        pro_dic = self.product_discount
+        if pro_dic != '' and pro_dic != None :
+            price = self.price - (self.price * pro_dic / 100)
+        elif cat != None and cat != '':
+            price = self.price - (self.price * cat / 100)
+        elif pro_dic != '' and pro_dic != None  and cat != None and cat != '':
+            if cat < pro_dic :
+                price = self.price - (self.price * pro_dic / 100)
+            else :
+                price = self.price - (self.price * cat / 100)   
+        else:
+            price = self.price
+        return price
     
 
 class Coupon(models.Model):
+    types = (
+        ('new','NEW'),
+        ('ref','REF')
+    )
     code = models.CharField(max_length=6,unique=True,null=True)
-    valid_from = models.DateTimeField()
     valid_to = models.DateTimeField()
     discount = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(100)])
+    coupon_type = models.CharField(choices=types,null=True,max_length=10)
     active = models.BooleanField()
 
     def __str__(self):
@@ -57,12 +81,13 @@ class Order(models.Model):
     def __str__(self):
         return str(self.id)
 
+
+
     @property
     def get_cart_total(self):
         orderitem = self.orderitem_set.all()
         try:
             code = self.coupon.discount
-            print(code)
         except:
             code = ''
         if code == '':
@@ -100,7 +125,7 @@ class OrderItem(models.Model):
 
     @property
     def get_total(self):
-        total = self.product.price * self.quantity
+        total = self.product.product_discount_price * self.quantity
         return total
 
 

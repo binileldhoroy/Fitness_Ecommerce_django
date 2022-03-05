@@ -1,0 +1,32 @@
+{% for product in products %}
+<div class="col-lg-3 shop-info-grid text-center mt-4">
+    <div class="product-shoe-info shoe">
+        
+        <div class="men-thumb-item">
+            <img src="{{product.image1.url}}" class="img-fluid" style="height: 150px;" alt="">
+
+        </div>
+        <div class="item-info-product">
+            <h4>
+                <a href="{% url 'product'  product.id %}">{{product.product_name|slice:":25"}}</a><small style="font-size: 12px;">more..</small>
+            </h4>
+            <div class="available mt-3">
+                <p>{{product.category.name}} </p>
+            </div>
+            <div class="product_price">
+                <!-- <p>
+                    {{product.name}} 
+                </p> -->
+                <div class="grid-price">
+                    {% if product.price > product.product_discount_price %}
+                        <strike class="money"> {{product.price | floatformat:2}}₹</strike>
+                    {% endif %}
+                    <span class="money"> {{product.product_discount_price| floatformat:2}}₹</span>
+                    <a href="{% url 'product' product.id %}" class="btn btn-info btn-view btn-block btn-sm m-1">View</a>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endfor %}

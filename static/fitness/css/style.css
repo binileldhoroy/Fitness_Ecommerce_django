@@ -299,6 +299,7 @@ li > a:only-child:after {
 .btn-view:hover{
     background-color: #a5352b !important ;
     border: 2px solid #a5352b !important;
+    color:#ffffff !important;
 }
 
 .btn-view:focus , .btn-view:active{
@@ -306,13 +307,13 @@ li > a:only-child:after {
     box-shadow: none !important;
 }
 .btn-cart{
-    background-color: transparent;
-    border: 2px solid #a5352b;
-    color:#a5352b ;
+    background-color: transparent !important;
+    border: 2px solid #a5352b !important;
+    color:#a5352b !important;
 }
 .btn-cart:hover{
-    background-color: #cc1606 ;
-    border: 2px solid #a5352b;
+    background-color: #cc1606 !important ;
+    border: 2px solid #a5352b !important;
 }
 
 /* Media Queries
@@ -2006,3 +2007,4 @@ h3.sub-w3ls-headf {
 .shadow-none {
     box-shadow: none!important;
 }
+

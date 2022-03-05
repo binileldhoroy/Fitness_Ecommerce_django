@@ -10,7 +10,15 @@
     
 </head>
 <body>
-  {% include 'alert_message.html' %}
+  {% for message in messages %}
+  <div class="alert {{ message.tags }} alert-dismissible fade show msg-tag" role="alert">
+      {{ message | safe }}
+      <button type="button" class="close msg-close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+      </button>
+  </div>
+
+  {% endfor %}
     <div class="container">
         <section class="vh-100">
             <div class="container py-5 h-100">
