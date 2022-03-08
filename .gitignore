@@ -1,2 +1,5 @@
 env/
 .env
+htmlcov/
+dashboard/tests/
+.coverage

@@ -33,7 +33,7 @@
                         <tbody>
                             {% for product in products %}
                             <tr>
-                                <td><img src="{{product.image1.url}}" class="img-fluid" style="height: 100px;" alt="">
+                                <td><img src="{{product.imageUrl}}" class="img-fluid" style="height: 100px;" alt="">
                                     <p>{{product.product_name}}</p>
                                 </td>
                                 <td>{{product.description|slice:":50"}}</td>

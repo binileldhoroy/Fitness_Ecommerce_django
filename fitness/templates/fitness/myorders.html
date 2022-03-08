@@ -11,7 +11,7 @@
         <div class="container w-100 p-0 d-flex justify-content-end">
             {% if order.approve_status == False %}
                 {% if order.cancel_status == False %}
-                <a href="{% url 'order-cancel' order.id %}" class="btn btn-danger btn-block btn-sm me-1" style="width:80px!important; margin-right: 40px;">Cancel</a>
+                <a href="{% url 'order-cancel' order.id %}" class="btn btn-danger btn-block btn-sm me-1" style="width:80px!important; margin-right: 40px!important;">Cancel</a>
                 {% else %}
                 <span class="btn btn-secondary" style="margin-right: 40px;">Order Canceled</span>
                 {% endif %}

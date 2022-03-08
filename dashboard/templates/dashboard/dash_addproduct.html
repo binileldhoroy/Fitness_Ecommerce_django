@@ -64,7 +64,7 @@
             <li><a href="{% url 'add-product' %}" class="btn btn-success btn-block btn-sm m-1">Add Product</a></li>
           </ul>
     </div>
-    <
+
     <div class="row">
         <form  method="POST" enctype="multipart/form-data">
             {% csrf_token %}
@@ -80,6 +80,7 @@
             {% endfor %}
             <button type="submit" class="btn btn-success" >Add Category</button>
         </form>
+        </div>
     {% endif %}
 
     <script src="{% static 'dashboard/js/crop.js' %}"></script>

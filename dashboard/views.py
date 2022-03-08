@@ -13,7 +13,7 @@ from datetime import datetime
 import csv
 import xlwt
 from django.template.loader import get_template
-import calendar
+from django.db.models import Q
 
 # Create your views here.
 @never_cache
@@ -126,8 +126,12 @@ def addProduct(request):
 @never_cache
 @login_required(login_url='admin-login')
 def viewProduct(request):
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
     if request.user.username == 'binil':
-        products = Product.objects.all()
+        products = Product.objects.filter(
+        Q(product_name__icontains=q)|
+        Q(description__icontains=q)|
+        Q(category__name__icontains=q))
     else:
         return redirect('login')
     return render(request,'dashboard/view_product.html',{'products':products})
@@ -262,6 +266,29 @@ def orderDelivered(request,pk):
     else:
         return redirect('login')    
     return render(request,'dashboard/view_items.html',context)
+
+
+@never_cache
+@login_required(login_url='login')
+def orderCancelAdmin(request,pk):
+    if request.user.is_authenticated:
+        Order.objects.filter(id=pk).update(cancel_status=True)
+        order = Order.objects.get(id=pk)
+        items = order.orderitem_set.all()
+        for item in items:
+            item_quantity = item.quantity
+            product_stock = item.product.stock
+            product_id = item.product.id
+            stock_updated = product_stock + item_quantity
+            Product.objects.filter(id = product_id).update(stock = stock_updated)
+            print(item_quantity)
+            print('.....',product_stock)
+            print(product_id)
+            print('.....',stock_updated)
+        return redirect('order-list')
+    else:
+        messages.error(request,'Something went wrong')
+        return render(request,'fitness/myorders.html')
 
 
 @never_cache

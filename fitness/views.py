@@ -54,6 +54,7 @@ def otpLogin(request):
         phone = request.POST.get('mobnumber')
         number = '+91' + str(phone)
         user = None
+        
         try:
             user = User.objects.get(phone=phone)
         except:
@@ -95,7 +96,7 @@ def otpVerify(request):
                 messages.error(request,"Incorrect OTP ")
                 return render(request, 'fitness/otpverify.html')
     else :
-        messages.success(request,"OTP has been sent to : "+ phone)
+        messages.success(request,"OTP has been sent")
     return render(request,'fitness/otpverify.html')
 
 
@@ -170,7 +171,7 @@ def signupView(request, *args, **kwargs):
                     except TwilioRestException as e:
                         messages.error(request,e)
         else:
-            messages.error(request,'SignUp Failed')
+            messages.error(request,'SignUp failed try again')
     context = {'form':form}
     return render(request,'fitness/signup.html',context)
 
@@ -185,7 +186,7 @@ def otpVerifySignUp(request):
             try:
                 phone_number = request.session.pop('phone_number')
             except:
-                messages.error(request,'SignUp Faild')
+                messages.error(request,'SignUp Faild try again')
                 return redirect('signup')
             
             number = '+91' + str(phone_number)
@@ -324,14 +325,12 @@ def checkOut(request):
         coupon = Coupon.objects.all()
         ref = Referral.objects.get(user=user)
         ref_count = Referral.objects.filter(user=user).count()
-        print(ref)
         try:
             ref_user = ref.recommended_by
             if ref_user is None:
                 ref_user = ''
         except:
             ref_user = ''
-        print('....',ref_user)
         address = user.shippingaddress_set.all()
         if request.method == 'POST':
             cur_address = request.POST.get('adrress')
@@ -354,7 +353,7 @@ def checkOut(request):
                     order = cur_order,
                     payment_method = 'cod',
                     payment_status = False,
-                    payment_amount = total
+                    payment_amount = round(total,2)
                 ).save()
                 order.address = add
                 now = datetime.now()
@@ -369,8 +368,8 @@ def checkOut(request):
                     product_id = item.product.id
                     stock_updated = product_stock - item_quantity
                     Product.objects.filter(id = product_id).update(stock = stock_updated)
-
-                return redirect('payment-complete')
+                data = {'status':'Your order has placed successfully'}
+                return JsonResponse(data)
 
         
     context = {'items':items,'order':order,'useraddress':address,'page':page,'coupons':coupon,'ref_user':ref_user,'ref_count':ref_count}
@@ -378,7 +377,7 @@ def checkOut(request):
 
 
 @never_cache
-@login_required(login_url='admin-login')
+@login_required(login_url='login')
 def orderCancel(request,pk):
     if request.user.is_authenticated:
         Order.objects.filter(id=pk).update(cancel_status=True)
@@ -420,7 +419,7 @@ def payRazorpay(request):
         email = user.email
         phone = user.phone
         return JsonResponse({
-        'cart_total':cart_total,
+        'cart_total':round(cart_total,2),
         'full_name':full_name,
         'email':email,
         'phone':phone
@@ -449,7 +448,7 @@ def razorpayComplete(request):
             order = cur_order,
             payment_method = 'razorpay',
             payment_status = True,
-            payment_amount = total
+            payment_amount = round(total,2)
         ).save()
 
         order.address = add
@@ -476,7 +475,8 @@ def razorpayComplete(request):
 def myProfile(request):
     user = request.user
     referral = Referral.objects.get(user=user)
-    return render(request,'fitness/myprofile.html',{'referral':referral})
+    order = Order.objects.get(user = user,order_status=False)
+    return render(request,'fitness/myprofile.html',{'referral':referral,'order':order})
 
 
 @never_cache
@@ -486,6 +486,7 @@ def myAddress(request):
         form = AddressForm()
         user = request.user
         address = user.shippingaddress_set.all()
+        order = Order.objects.get(user = user,order_status=False)
         if request.method == 'POST':
             ShippingAddress.objects.create(
                 user = request.user,
@@ -502,7 +503,7 @@ def myAddress(request):
                 )
             return redirect('my-address')
 
-        context = {'form':form,'useraddress':address}
+        context = {'form':form,'useraddress':address,'order':order}
         return render(request,'fitness/myaddress.html',context)
 
 
@@ -524,6 +525,8 @@ def changeAddress(request,pk):
      if request.user.is_authenticated:
         address = ShippingAddress.objects.get(id=pk)
         form = AddressForm(instance=address)
+        
+        order = Order.objects.get(user = request.user,order_status=False)
         if request.method == 'POST':
             form = AddressForm(request.POST,instance=address)
             if form.is_valid():
@@ -531,7 +534,7 @@ def changeAddress(request,pk):
                 messages.success(request,'Update Successfully')
             return redirect('my-address')
                 
-        context = {'form':form}
+        context = {'form':form,'order':order}
         return render(request,'fitness/edit_address.html',context)
 
 

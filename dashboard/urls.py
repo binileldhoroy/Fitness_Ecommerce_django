@@ -17,6 +17,7 @@ urlpatterns = [
     path('order-accept/<str:pk>',views.orderAccept,name='order-accept'),
     path('order-shipped/<str:pk>',views.orderShipped,name='order-shipped'),
     path('order-delivered/<str:pk>',views.orderDelivered,name='order-delivered'),
+    path('order-cancel-admin/<str:pk>/',views.orderCancelAdmin,name='order-cancel-admin'),
     path('sales-report/',views.salesReport,name='sales-report'),
     path('export-csv/',views.exportCsv,name='export-csv'),
     path('export-excel/',views.exportExcel,name='export-excel'),

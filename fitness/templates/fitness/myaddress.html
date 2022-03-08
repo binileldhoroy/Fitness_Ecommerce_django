@@ -22,7 +22,7 @@
                 <div class=" p-1  row" id="form-wrapper">
                 {% for address in useraddress %}
                 <div class="col-md-6" >
-                    <div class="form-check m-2 box-element " style="height: 300px;">
+                    <div class="form-check m-2 box-element " >
                         <div class="social-ficons mt-4 w-100 d-flex justify-content-end">
                             <ul>
                                 <li><a href="{% url 'change-address' address.id %}"  class="btn  btn-block btn-outline-success btn-sm m-1">Edit</a></li>
@@ -33,8 +33,7 @@
                             <p>{{address.f_name}} {{address.l_name}}</p>
                             <p>{{address.email}}, {{address.phone}}</p>
                             <p>{{address.address1}}, {{address.address2}}</p>
-                            <p>{{address.city}}</p>
-                            <p>{{address.state}}</p>
+                            <p>{{address.city}} ,{{address.state}}</p>
                             <p>{{address.pincode}}</p>
                             <p>{{address.post_office}}</p>
                         </label>

@@ -31,6 +31,14 @@ class Product(models.Model):
         return self.product_name
 
     @property
+    def imageUrl(self):
+        try:
+            url = self.image1.url
+        except:
+            url = ''
+        return url
+
+    @property
     def product_discount_price(self):
         cat = self.category.category_discount
         pro_dic = self.product_discount
@@ -45,7 +53,7 @@ class Product(models.Model):
                 price = self.price - (self.price * cat / 100)   
         else:
             price = self.price
-        return price
+        return round(price,2)
     
 
 class Coupon(models.Model):
@@ -96,7 +104,7 @@ class Order(models.Model):
             total_dis = sum([item.get_total for item in orderitem])
             total = total_dis - (total_dis * code / 100)
         
-        return total
+        return round(total,2)
     
     @property
     def get_cart_items(self):

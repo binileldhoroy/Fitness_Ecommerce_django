@@ -76,14 +76,44 @@
                 
             </div>
 
-            <div class="d-flex">
+            <div >
               <p>Your Referral Link :-</p>
-              <p style="color: blue;">http://127.0.0.1:8000/signup/{{referral.ref_code}}</p>
+              <div class="row">
+                <div class="col-md-8">
+                  <div class="input-group">
+                    <input type="text" class="form-control" disabled value="http://127.0.0.1:8000/signup/{{referral.ref_code}}" id="myInput">
+                  </div>
+                   
+                </div>
+                <div class="col-md-4">
+                  <div class="tooltip1">
+                    <button onclick="myFunction()" onmouseout="outFunc()" class="btn btn-outline-success">
+                      <span class="tooltiptext" id="myTooltip">Copy to clipboard</span>
+                      Copy link
+                      </button>
+                    </div>
+                </div>
+              </div>
             </div>
         </div>
 
     </div>
 </div>
 
-
+<script>
+  function myFunction() {
+    var copyText = document.getElementById("myInput");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(copyText.value);
+    
+    var tooltip = document.getElementById("myTooltip");
+    tooltip.innerHTML = "Copied: " + copyText.value;
+  }
+  
+  function outFunc() {
+    var tooltip = document.getElementById("myTooltip");
+    tooltip.innerHTML = "Copy to clipboard";
+  }
+  </script>
 {% endblock %}

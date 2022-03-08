@@ -1,6 +1,7 @@
 {% extends 'dashboard_main.html' %}
 
 {% block dashboard %}
+{%load crispy_forms_tags %} 
 <div class="row page-titles">
     <div class="col-md-5 align-self-center">
         <h3 class="text-themecolor">Dashboard</h3>
@@ -10,19 +11,20 @@
         </ol>
     </div>
 </div>
-<div class="row">
+<div class="col-md-10 col-12 mx-auto">
+  <div class="row">
+      <div class="col-md-12 col-12">
+          <div class="card" style="margin-top: 30px;">
+              <div class="card-body">
     <form  method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        {% for field in form %}
-        <div class="row g-3 align-items-center">
-            <div class="col-auto">
-              <label for="inputPassword6" class="col-form-label">{{field.label}}</label>
-            </div>
-            <div class="col-auto">
-              {{field}}
-            </div>
-          </div>
-        {% endfor %}
-        <button type="submit" style="border: 2px; border-radius: 5px;" >Update</button>
+        {{ form|crispy }}
+        <button type="submit" id="confirm-btn" class="btn btn-success" >Update</button>
     </form>
+  </div>
+</div>
+</div>
+
+</div>
+</div>
 {% endblock %}

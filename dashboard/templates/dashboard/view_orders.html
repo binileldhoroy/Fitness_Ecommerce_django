@@ -45,7 +45,11 @@
                                     {% if order.delivery_status == True %}
                                         <p style="color: green;">Product Delevered</p>
                                     {% else %}
-                                    <p style="color: orange;">Order pending</p>
+                                        {% if order.cancel_status == True %}
+                                        <p style="color: rgb(245, 99, 99);">Order Cancled</p>
+                                        {% else %}
+                                        <p style="color: orange;">Order Pending</p>
+                                        {% endif %}
                                     {% endif %}
                                 </td>
                                 <td><a href="{% url 'order-items' order.id %}" class="btn btn-success btn-block btn-sm m-1">View Items</a></td>
