@@ -59,53 +59,81 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
 $('.update-cart').on('click',function (e) {
-var product = $(this).data('product')
-var action = $(this).data('action')
-console.log(product)
-console.log(action)
-  $.ajax({
-      type : 'POST',
-      url : "{% url 'update-item' %}",
-      data : {
-          productId : product,
-          action : action,
-          csrfmiddlewaretoken : "{{ csrf_token }}"
-      },
-      dataType: 'json',
-      success:function(response){
-        var items = response.items
-        var quantity = response.quantity
-        var total = response.total
-        var cart_total = response.cart_total
-        var productId = response.productId
-        var stock = response.stock
 
-        
-        // console.log(cur_stock)
-        if(stock == 0){
-           $('#'+productId + ' #max_stock').show();
-        }else{
-            $('#'+productId + ' #max_stock').hide();
-        }
+    if('{{ user }}' == 'AnonymousUser'){ 
+				var productId = $(this).data('product')
+				var action = $(this).data('action')
+				  if (action == 'add'){
+					if (cart[productId] == undefined){
+					cart[productId] = {'quantity':1}
+					}else{
+					  cart[productId]['quantity'] += 1
+					}
+				  }
+                  if(action == 'remove'){
+                    cart[productId]['quantity'] -= 1
 
-        if(quantity == 0){
-            location.reload();
-        }
-        
-        var total_id = '#' + productId + " #total"
-        var item_id =  " #items"
-        var cart_total_id = " #cart_total"
-        var quantity_id = '#' + productId + " #quantity"
-       
-        $(total_id).html(total.toFixed(2))
-        $(item_id).html(items )
-        $(cart_total_id).html('₹' + cart_total.toFixed(2))
-        $(quantity_id).html('x ' + quantity)
-        $('#cart_items').html(items)
-       
-        
-      }
-  });
+                    if(cart[productId]['quantity'] <= 0){
+                        console.log('item Removed')
+                        delete cart[productId]
+                    }
+                }
+				  console.log('CART:', cart)
+				  document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+				  location.reload()
+				
+			}else{
+
+                
+                
+                var product = $(this).data('product')
+                var action = $(this).data('action')
+                console.log(product)
+                console.log(action)
+                $.ajax({
+                    type : 'POST',
+                    url : "{% url 'update-item' %}",
+                    data : {
+                        productId : product,
+                        action : action,
+                        csrfmiddlewaretoken : "{{ csrf_token }}"
+                    },
+                    dataType: 'json',
+                    success:function(response){
+                        var items = response.items
+                        var quantity = response.quantity
+                        var total = response.total
+                        var cart_total = response.cart_total
+                        var productId = response.productId
+                        var stock = response.stock
+                        
+                        
+                        // console.log(cur_stock)
+                        if(stock == 0){
+                            $('#'+productId + ' #max_stock').show();
+                        }else{
+                            $('#'+productId + ' #max_stock').hide();
+                        }
+                        
+                        if(quantity == 0){
+                            location.reload();
+                        }
+                        
+                        var total_id = '#' + productId + " #total"
+                        var item_id =  " #items"
+                        var cart_total_id = " #cart_total"
+                        var quantity_id = '#' + productId + " #quantity"
+                        
+                        $(total_id).html(total.toFixed(2))
+                        $(item_id).html(items )
+                        $(cart_total_id).html('₹' + cart_total.toFixed(2))
+                        $(quantity_id).html('x ' + quantity)
+                        $('#cart_items').html(items)
+                        
+                        
+                    }
+                });
+            }
 });
 </script>
 

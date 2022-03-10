@@ -1,11 +1,10 @@
 import json
-from urllib import response
+from pickle import TRUE
 from django.shortcuts import redirect, render
 from django.contrib import messages
 from .models import *
 from .forms import *
-from dashboard.models import Category, Coupon, Product
-from dashboard.models import Order, OrderItem, Payment, Product
+from dashboard.models import *
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from twilio.rest import Client
@@ -18,6 +17,7 @@ from django.contrib.auth.views import PasswordChangeView, PasswordResetDoneView
 from .otp import *
 from django.template.loader import render_to_string
 from django.db.models import Q
+from .cookie_cart import cookieCart
 
 # Create your views here.
 
@@ -213,20 +213,39 @@ def otpVerifySignUp(request):
 @never_cache
 def home(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
+    cart_item = False
     if request.user.is_authenticated:
-        user = request.user
-        order, created  = Order.objects.get_or_create(user = user,order_status=False)
-        items = order.orderitem_set.all()
-    else:
-        order = []
+        try:
+            cart = json.loads(request.COOKIES['cart'])
+        except:
+            cart = {}
 
+        user = request.user
+        if bool(cart):
+            order, created  = Order.objects.get_or_create(user = user,order_status=False,buy_now=False)
+            for i in cart:
+                product = Product.objects.get(id=i)
+                try:
+                    item = OrderItem.objects.get(product=product, order=order)
+                except:
+                    item = OrderItem.objects.create(product=product,order=order,quantity=0)
+                quantity = int(item.quantity) + cart[i]['quantity']
+                OrderItem.objects.filter(product=product, order=order).update(quantity=quantity)
+                cart_item = True
+        else:
+            order, created  = Order.objects.get_or_create(user = user,order_status=False,buy_now=False)
+    else:
+        cookieData = cookieCart(request)
+        order = cookieData['order']
+    
     cats = Category.objects.all()
     products = Product.objects.filter(
         Q(product_name__icontains=q)|
         Q(description__icontains=q)|
         Q(category__name__icontains=q)
     )
-    context = {'products':products,'order':order,'cats':cats}
+
+    context = {'products':products,'cats':cats,'cart_item':cart_item,'order':order}
     return render(request,'fitness/home.html',context)
 
 
@@ -244,7 +263,7 @@ def filterData(request):
 def myOrders(request):
     if request.user.is_authenticated:
         user = request.user
-        order, created  = Order.objects.get_or_create(user = user,order_status=False)
+        order, created  = Order.objects.get_or_create(user = user,order_status=False,buy_now=False)
         orders = Order.objects.filter(user=user,order_status=True)
         items = OrderItem.objects.all()
     context = {'orders':orders,'items':items,'order':order}
@@ -252,12 +271,14 @@ def myOrders(request):
 
 
 @never_cache
-@login_required(login_url='login')
 def productView(request,pk):
     if request.user.is_authenticated:
         user = request.user
-        order, created  = Order.objects.get_or_create(user = user,order_status=False)
+        order, created  = Order.objects.get_or_create(user = user,order_status=False,buy_now=False)
         items = order.orderitem_set.all()
+    else:
+        cookieData = cookieCart(request)
+        order = cookieData['order']
     product = Product.objects.get(id=pk)
     related_product = Product.objects.filter(category=product.category)
     context = {'product':product,'re_products':related_product,'order':order}
@@ -265,12 +286,16 @@ def productView(request,pk):
 
 
 @never_cache
-@login_required(login_url='login')
 def cart(request):
     if request.user.is_authenticated:
         user = request.user
-        order, created  = Order.objects.get_or_create(user = user,order_status=False)
+        Order.objects.filter(user = user,order_status=False,buy_now=True).delete()
+        order, created  = Order.objects.get_or_create(user = user,order_status=False,buy_now=False)
         items = order.orderitem_set.all()
+    else:
+        cookieData = cookieCart(request)
+        order = cookieData['order']
+        items = cookieData['items']
 
     context = {'items':items,'order':order} 
     return render(request,'fitness/cart.html',context)
@@ -288,7 +313,7 @@ def updateCartItem(request):
     product = Product.objects.get(id=productId)
     cur_stock = product.stock
     print('cur:-',cur_stock)
-    order, created = Order.objects.get_or_create(user=user, order_status=False)
+    order, created = Order.objects.get_or_create(user=user, order_status=False,buy_now=False)
 
     orderItem, created = OrderItem.objects.get_or_create(order=order,product=product)
     if cur_stock > orderItem.quantity:
@@ -316,12 +341,30 @@ def updateCartItem(request):
 
 @never_cache
 @login_required(login_url='login')
+def buyNow(request,pk):
+    if request.user.is_authenticated:
+        user = request.user
+        Order.objects.filter(user = user,order_status=False,buy_now=True).delete()
+        order = Order.objects.create(user = user,order_status=False,buy_now=True)
+        product = Product.objects.get(id = pk)
+        orderItem = OrderItem.objects.create(order=order,product=product,quantity=1)
+        return redirect('check-out')
+
+
+
+@never_cache
+@login_required(login_url='login')
 def checkOut(request):
     page = 'address'
     if request.user.is_authenticated:
         user = request.user
-        order, created  = Order.objects.get_or_create(user = user,order_status=False)
+        # breakpoint()
+        try:
+            order = Order.objects.get(user = user,order_status=False,buy_now=True)
+        except:
+            order, created  = Order.objects.get_or_create(user = user,order_status=False,buy_now=False)
         items = order.orderitem_set.all()
+        print(items)
         coupon = Coupon.objects.all()
         ref = Referral.objects.get(user=user)
         ref_count = Referral.objects.filter(user=user).count()
@@ -360,7 +403,7 @@ def checkOut(request):
                 cur_date = now
                 order.date = cur_date
                 order.save()
-                Order.objects.filter(user=user).update(order_status = True)
+                Order.objects.filter(id=order.id).update(order_status = True)
                 items = order.orderitem_set.all()
                 for item in items:
                     item_quantity = item.quantity
@@ -412,7 +455,10 @@ def paymentComplete(request):
 def payRazorpay(request):
     if request.user.is_authenticated:
         user = request.user
-        order, created  = Order.objects.get_or_create(user = user,order_status=False)
+        try:
+            order = Order.objects.get(user = user,order_status=False,buy_now=True)
+        except:
+            order, created  = Order.objects.get_or_create(user = user,order_status=False,buy_now=False)
         cur_order = Order.objects.get(id = order.id)
         cart_total = order.get_cart_total
         full_name = user.first_name + user.last_name
@@ -432,7 +478,10 @@ def razorpayComplete(request):
     if request.user.is_authenticated:
         user = request.user
 
-        order, created  = Order.objects.get_or_create(user = user,order_status=False)
+        try:
+            order = Order.objects.get(user = user,order_status=False,buy_now=True)
+        except:
+            order, created  = Order.objects.get_or_create(user = user,order_status=False,buy_now=False)
         items = order.orderitem_set.all()
 
         cur_address = request.POST.get('cur_address')
@@ -456,7 +505,7 @@ def razorpayComplete(request):
         cur_date = now
         order.date = cur_date
         order.save()
-        Order.objects.filter(user=user).update(order_status = True)
+        Order.objects.filter(id=order.id).update(order_status = True)
         items = order.orderitem_set.all()
         for item in items:
             item_quantity = item.quantity

@@ -1,4 +1,3 @@
-import re
 from django.db import models
 from fitness.models import User,ShippingAddress
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -42,15 +41,15 @@ class Product(models.Model):
     def product_discount_price(self):
         cat = self.category.category_discount
         pro_dic = self.product_discount
-        if pro_dic != '' and pro_dic != None :
-            price = self.price - (self.price * pro_dic / 100)
-        elif cat != None and cat != '':
-            price = self.price - (self.price * cat / 100)
-        elif pro_dic != '' and pro_dic != None  and cat != None and cat != '':
+        if pro_dic != '' and pro_dic != None  and cat != None and cat != '':
             if cat < pro_dic :
                 price = self.price - (self.price * pro_dic / 100)
             else :
                 price = self.price - (self.price * cat / 100)   
+        elif pro_dic != '' and pro_dic != None :
+            price = self.price - (self.price * pro_dic / 100)
+        elif cat != None and cat != '':
+            price = self.price - (self.price * cat / 100)
         else:
             price = self.price
         return round(price,2)
@@ -82,6 +81,7 @@ class Order(models.Model):
     cancel_status = models.BooleanField(default=False)
     delivery_status = models.BooleanField(default=False)
     coupon = models.ForeignKey(Coupon,on_delete=models.SET_NULL,null=True, blank=True)
+    buy_now = models.BooleanField(default=False,null=True)
 
     class Meta:
         ordering = ('-date_ordered',)

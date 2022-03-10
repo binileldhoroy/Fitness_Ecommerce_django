@@ -2047,3 +2047,13 @@ h3.sub-w3ls-headf {
   visibility: visible;
   opacity: 1;
 }
+
+.whatsapp{
+    background-color: #01e675 !important ;
+    border: none !important;
+    overflow: hidden !important;
+}   
+
+.whatsapp a{
+    color: rgb(255, 255, 255) !important;
+}

@@ -1,7 +1,7 @@
 from encodings import utf_8
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
-from fitness.models import User
+from fitness.models import *
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
@@ -171,13 +171,32 @@ def deleteProduct(request,pk):
 def addCategory(request):
     if request.user.username == 'binil':
         form = CategoryForm()
+        category = Category.objects.all()
         if request.method == 'POST':
             category = request.POST.get('name')
             Category.objects.get_or_create(name=category)
             messages.success(request,'Cateory is Added')
             return redirect('add-category')
-        else:
-            return render(request,'dashboard/dash_addproduct.html',{'form':form})
+        
+        return render(request,'dashboard/dash_addproduct.html',{'form':form,'category':category})
+    else:
+        return redirect('login')
+
+
+@never_cache
+@login_required(login_url='admin-login')
+def editCategory(request,pk):
+    if request.user.username == 'binil':
+        cat = Category.objects.get(id=pk)
+        form = CategoryForm(instance=cat)
+        if request.method == 'POST':
+            form = CategoryForm(request.POST,instance=cat)
+            if form.is_valid():
+                form.save()
+                messages.success(request,'Update Successfully')
+                return redirect('add-category')
+        
+        return render(request,'dashboard/edit_category.html',{'form':form})
     else:
         return redirect('login')
 

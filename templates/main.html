@@ -78,7 +78,30 @@
   </style>
   </head>
   <body>
-    
+    <script>
+      function getCookie(name) {
+        var cookieArr = document.cookie.split(";");
+        for (var i = 0; i < cookieArr.length; i++) {
+          var cookiePair = cookieArr[i].split("=");
+          if (name == cookiePair[0].trim()) {
+            return decodeURIComponent(cookiePair[1]);
+          }
+        }
+        return null
+      }
+      var cart = JSON.parse(getCookie('cart'))
+      if (cart == undefined) {
+        cart = {}
+        console.log('cart was created')
+        document.cookie = 'cart=' + JSON.stringify(cart) + ';domain=;path=/'
+      }
+    </script>
+    {% if cart_item %}
+    <script>
+      cart = {}
+      document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+    </script>
+    {% endif %}
     <div class="main-sec inner-page">
       <!-- //header -->
       <header class="py-sm-3 pt-3 pb-2" id="home">
@@ -127,13 +150,13 @@
                 {% if request.user.is_authenticated %}
                 <li><a href="{% url 'my-profile' %}">My Profile</a></li>
                 <li><a href="{% url 'my-orders' %}">My Orders</a></li>
+                {% endif %}
                 <li>
                     <a href="{% url 'cart' %}"><img  id="cart-icon" src="{% static 'fitness/images/cart2.png' %}" >
                         
                     </a>
                     <li style="color: rgb(236 28 36);" id="cart_items">{{order.get_cart_items}}</li>
                 </li>
-                {% endif %}
               </ul>
             </nav>
             <!-- //nav -->

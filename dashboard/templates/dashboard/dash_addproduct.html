@@ -81,6 +81,30 @@
             <button type="submit" class="btn btn-success" >Add Category</button>
         </form>
         </div>
+        <div class="col-md-5">
+          <div class="form-group">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Categiry Name</th>
+                  <th>Category Discount</th>
+                  <th>Add Discount</th>
+                </tr>
+              </thead>
+              <tbody>                
+                {% for cat in category %}
+                <tr>
+                  <td>{{ cat.name }}</td>
+                  <td>{{ cat.category_discount }}</td>
+                  <td>
+                    <a href="{% url 'edit-category' cat.id %}" class="btn btn-success btn-block btn-sm m-1">Edit</a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+              </table>
+          </div>
+        </div>
     {% endif %}
 
     <script src="{% static 'dashboard/js/crop.js' %}"></script>
