@@ -9,6 +9,10 @@
               <form action="" method="post">
                 {% csrf_token %}
                 {{ form|crispy }}
+                <div class="input-group mb-3">
+                    <input type="date" class="form-control" placeholder="Date" name="coupon_date" aria-label="Username" aria-describedby="basic-addon1">
+                  </div>
+                  
                 <button type="submit" class="btn btn-success btn-md ">Add</button>
               </form>
             </div>
@@ -28,7 +32,6 @@
                     <thead>
                         <tr>
                             <th>Coupon Code</th>
-                            <th>Valid From</th>
                             <th>Valid To</th>
                             <th>Discount</th>
                             <th>Status</th>
@@ -41,7 +44,6 @@
                         <td>
                             <p>{{coupon.code}}</p>
                         </td>
-                        <td>{{coupon.valid_from}}</td>
                         <td>{{coupon.valid_to}}</td>
                         <td>{{coupon.discount}}</td>
                         <td>{{coupon.active}}</td>

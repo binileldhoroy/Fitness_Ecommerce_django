@@ -14,6 +14,6 @@ class CategoryForm(ModelForm):
 class CouponForm(ModelForm):
     class Meta:
         model = Coupon
-        fields = '__all__'
+        fields = ['code','discount','coupon_type','active']
 
 

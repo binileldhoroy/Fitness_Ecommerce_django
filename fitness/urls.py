@@ -30,4 +30,6 @@ urlpatterns = [
     path('apply-coupon/',views.applyCoupon,name='apply-coupon'),
     path('remove-coupon/<str:pk>/',views.removeCoupon,name='remove-coupon'),
     path('filter/',views.filterData,name='filter'),
+    path('wish-list/',views.addWishList,name='wish-list'),
+    path('my-wishlist/',views.myWishList,name='my-wishlist'),
 ]

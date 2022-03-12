@@ -1,5 +1,4 @@
 import json
-from pickle import TRUE
 from django.shortcuts import redirect, render
 from django.contrib import messages
 from .models import *
@@ -16,7 +15,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordChangeView, PasswordResetDoneView
 from .otp import *
 from django.template.loader import render_to_string
-from django.db.models import Q
+from django.db.models import Q, Min, Max
 from .cookie_cart import cookieCart
 
 # Create your views here.
@@ -212,15 +211,26 @@ def otpVerifySignUp(request):
 
 @never_cache
 def home(request):
-    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    # q = request.GET.get('q') if request.GET.get('q') != None else ''
+    if request.method == 'GET':
+        q = request.GET.get('q')
+        min_price = request.GET.get('minprice')
+        max_price = request.GET.get('maxprice')
+        if q == None:
+            q = ''
     cart_item = False
+    user = request.user
+    try:
+        wish = [i.wish_product for i in  WishList.objects.filter(wish_user=user)]
+    except:
+        wish=''
     if request.user.is_authenticated:
         try:
             cart = json.loads(request.COOKIES['cart'])
         except:
             cart = {}
 
-        user = request.user
+        
         if bool(cart):
             order, created  = Order.objects.get_or_create(user = user,order_status=False,buy_now=False)
             for i in cart:
@@ -234,24 +244,40 @@ def home(request):
                 cart_item = True
         else:
             order, created  = Order.objects.get_or_create(user = user,order_status=False,buy_now=False)
+        
     else:
         cookieData = cookieCart(request)
         order = cookieData['order']
     
     cats = Category.objects.all()
-    products = Product.objects.filter(
-        Q(product_name__icontains=q)|
-        Q(description__icontains=q)|
-        Q(category__name__icontains=q)
-    )
-
-    context = {'products':products,'cats':cats,'cart_item':cart_item,'order':order}
+    minPrice = Product.objects.aggregate(Min('price'))
+    maxPrice = Product.objects.aggregate(Max('price'))
+    if max_price != None and min_price != None:
+        products = Product.objects.filter(price__range=(min_price, max_price))
+        print(max_price,'...',min_price)
+    else:    
+        products = Product.objects.filter(
+            Q(product_name__icontains=q)|
+            Q(description__icontains=q)|
+            Q(category__name__icontains=q)
+        )
+    context = {'products':products,
+            'cats':cats,'cart_item':cart_item,
+            'order':order,'wish':wish,'minPrice':minPrice,
+            'maxPrice':maxPrice
+            }
     return render(request,'fitness/home.html',context)
 
 
 def filterData(request):
     category = request.GET.getlist('category[]')
     products  = Product.objects.all().order_by('-id').distinct()
+    minPrice = request.GET['minPrice']
+    maxPrice  = request.GET['maxPrice']
+    # products = products.filter(price__lte=minPrice)
+    products = products.filter(price__gte=maxPrice)
+    print(products)
+    
     if len(category) > 0:
         products = products.filter(category__id__in=category).distinct()
     t = render_to_string('fitness/product-list.html',{'products':products})
@@ -525,7 +551,8 @@ def myProfile(request):
     user = request.user
     referral = Referral.objects.get(user=user)
     order = Order.objects.get(user = user,order_status=False)
-    return render(request,'fitness/myprofile.html',{'referral':referral,'order':order})
+    counts = WishList.objects.filter(wish_user=user).count()
+    return render(request,'fitness/myprofile.html',{'referral':referral,'order':order,'counts':counts})
 
 
 @never_cache
@@ -536,6 +563,7 @@ def myAddress(request):
         user = request.user
         address = user.shippingaddress_set.all()
         order = Order.objects.get(user = user,order_status=False)
+        counts = WishList.objects.filter(wish_user=user).count()
         if request.method == 'POST':
             ShippingAddress.objects.create(
                 user = request.user,
@@ -552,7 +580,7 @@ def myAddress(request):
                 )
             return redirect('my-address')
 
-        context = {'form':form,'useraddress':address,'order':order}
+        context = {'form':form,'useraddress':address,'order':order,'counts':counts}
         return render(request,'fitness/myaddress.html',context)
 
 
@@ -602,7 +630,12 @@ def editProfile(request):
 class MyPasswordChangeView(PasswordChangeView):
     template_name = 'fitness/change_password.html'
     success_url = reverse_lazy('change-password-done')
-
+    def get_context_data(self,*args, **kwargs):
+        context = super( MyPasswordChangeView, self).get_context_data(*args,**kwargs)
+        user = self.request.user
+        print(user)
+        context['counts'] = WishList.objects.filter(wish_user=user).count()
+        return context
 
 class MyPasswordResetDoneView(PasswordResetDoneView):
     template_name = 'fitness/password_reset_done.html'
@@ -634,3 +667,32 @@ def removeCoupon(request,pk):
     user = request.user
     Order.objects.filter(user = user,order_status=False,id = pk).update(coupon = '')
     return redirect('check-out')
+
+
+def addWishList(request):
+    if request.user.is_authenticated:
+        user = request.user
+        if request.method == 'POST':
+            productId = request.POST.get('wish_product')
+            action = request.POST.get('wish_action')
+            print(productId,action)
+            product = Product.objects.get(id=productId)
+            if action == 'add_wish':
+                wishlist = WishList.objects.get_or_create(wish_user=user,wish_product=product)
+                result = 'added'
+                status = 'added to'
+            elif action == 'remove_wish':
+                wishlist = WishList.objects.get(wish_user=user,wish_product=product)
+                wishlist.delete()
+                result = 'removed'
+                status = 'removed from'
+        data = {'result':result,'productId':productId,'status':status}
+    return JsonResponse(data)
+
+
+def myWishList(request):
+    user = request.user
+    products = WishList.objects.filter(wish_user=user)
+    counts = products.count()
+    wish = [i.wish_product for i in  WishList.objects.filter(wish_user=user)]
+    return render(request,'fitness/mywishlist.html',{'products':products,'wish':wish,'counts':counts})

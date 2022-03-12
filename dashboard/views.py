@@ -321,8 +321,19 @@ def salesReport(request):
             yr.append(num+i)
         orders = Order.objects.filter(payment__payment_status=True)
         if request.method == 'POST':
-            s_date = request.POST.get('sdate')
-            e_date = request.POST.get('edate')
+            datestr = request.POST.get('dates')
+            #start date
+            mo = datestr[:2]
+            da = datestr[3:5]
+            ye = datestr[6:10]
+            #enddate
+            mo1 = datestr[13:15]
+            da1 = datestr[16:18]
+            ye1 = datestr[19:]
+            s_date = ye+'-'+mo+'-'+da
+            e_date = ye1+'-'+mo1+'-'+da1
+            print(s_date)
+            print('.......',e_date)
             month = request.POST.get('month')
             year = request.POST.get('year')
             print(year)
@@ -424,8 +435,12 @@ def addCoupon(request):
         coupons = Coupon.objects.all()
         if request.method == 'POST':
             form = CouponForm(request.POST)
+            coupon_date = request.POST.get('coupon_date')
+            print(coupon_date)
             if form.is_valid():
-                form.save()
+                instance = form.save(commit=False)
+                instance.valid_to = coupon_date
+                instance.save()
                 return redirect('add-coupon')
         context = {'form':form,'coupons':coupons}
     else:

@@ -3,6 +3,7 @@
 {% block content %}
 {% load static %}
 
+
 <script type="text/javascript" src="{% static 'fitness/js/product-filter.js' %}"></script>
 <!-- <img src="{% static 'fitness/images/DoubleRing.gif' %}" style="background: no-repeat; background: center;" alt="" id="loader"> -->
 <section class="banner-bottom py-5">
@@ -24,6 +25,12 @@
 					{% endfor %}
 				</div>
 			</div>
+
+            <!-- Price Filter -->
+			<div class="card mb-4">
+				{% include 'fitness/pricerange.html' %}
+                </div>
+
         </div>
     </div>
     <div class="col-md-9">
@@ -31,8 +38,17 @@
                 <!--/row-->
                 <div class="row shop-wthree-info text-center" id="filterproducts" >
                     {% for product in products %}
-                    <div class="col-lg-3 shop-info-grid text-center mt-4" >
+                    <div class="col-lg-3 shop-info-grid text-center mt-4" style="position: relative;" id="{{product.id}}">
+                        
                         <div class="product-shoe-info shoe">
+                               
+                            <div class="btn {% if product in wish %} wishlist {% else %} wishlist1 {% endif %}" 
+                            id="wish1{{product.id}}"   ><i value="{{product.id}}" id="icon{{product.id}}" 
+                            class="wish_list {% if product in wish %} wishlist {% else %} wishlist1 {% endif %}   
+                            {% if product in wish %} fa-solid {% else %} fa-regular {% endif %}  fa-heart"
+                            ></i></div>
+                            
+                            <!-- <div class="btn " id="wish2" ><i class=" fa-heart wish" data-product="{{product.id}}" data-action="add_wish"></i></div> -->
                             
                             <div class="men-thumb-item">
                                 <img src="{{product.imageUrl}}" class="img-fluid" style="height: 150px;" alt="">
@@ -69,5 +85,92 @@
     </div>
 </section>
 
+<script>
+$('.wish_list').on('click',function(e){
+    if('{{user}}' == 'AnonymousUser'){
+        var wish_product = $(this).data('product')
+        var wish_action = $(this).data('action')
+        var toastMixin = Swal.mixin({
+                    toast: true,
+                    icon: 'success',
+                    title: 'General Title',
+                    animation: false,
+                    position: 'bottom',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
 
+                toastMixin.fire({
+                    animation: true,
+                    title: 'You should SignUp/Login'
+                })
+    }else{
+        var wish_product = $(this).attr('value')
+        var wish_action = ''
+        if ($(this).hasClass('wishlist')){
+            wish_action = 'remove_wish'
+        }else if($(this).hasClass('wishlist1')){
+            wish_action = 'add_wish'
+        }
+
+        $.ajax({
+            method: "POST",
+            url: "/wish-list/",
+            data: {
+                wish_product : wish_product,
+                wish_action : wish_action,  
+                csrfmiddlewaretoken : "{{ csrf_token }}"
+            },
+            dataType: "json",
+            success: function (response) {
+                var res = response.result
+                var productId = response.productId
+                var status = response.status
+                console.log(res)
+                console.log(productId)
+                if(res=='added'){
+                    $('#'+productId+' #wish1'+productId).removeClass('wishlist1')
+                    $('#'+productId+' #wish1'+productId).addClass('wishlist')
+                    $('#'+productId+' #icon'+productId).removeClass('fa-regular')
+                    $('#'+productId+' #icon'+productId).addClass('fa-solid')
+                    $('#'+productId+' #icon'+productId).removeClass('wishlist1')
+                    $('#'+productId+' #icon'+productId).addClass('wishlist')
+                }else if(res == 'removed'){
+                    $('#'+productId+' #wish1'+productId).removeClass('wishlist')
+                    $('#'+productId+' #wish1'+productId).addClass('wishlist1')
+                    $('#'+productId+' #icon'+productId).removeClass('fa-solid')
+                    $('#'+productId+' #icon'+productId).addClass('fa-regular')
+                    $('#'+productId+' #icon'+productId).removeClass('wishlist')
+                    $('#'+productId+' #icon'+productId).addClass('wishlist1')
+                }
+
+                var toastMixin = Swal.mixin({
+                    toast: true,
+                    icon: 'success',
+                    title: 'General Title',
+                    animation: false,
+                    position: 'bottom',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+
+                toastMixin.fire({
+                    animation: true,
+                    title: 'Product '+ status +' WishList'
+                })
+            }
+        });
+    }
+})
+</script>
 {% endblock %}

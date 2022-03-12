@@ -29,6 +29,7 @@ class Product(models.Model):
     def __str__(self):
         return self.product_name
 
+    #if image url not fount
     @property
     def imageUrl(self):
         try:
@@ -37,6 +38,7 @@ class Product(models.Model):
             url = ''
         return url
 
+    #product and category discound
     @property
     def product_discount_price(self):
         cat = self.category.category_discount
@@ -61,7 +63,7 @@ class Coupon(models.Model):
         ('ref','REF')
     )
     code = models.CharField(max_length=6,unique=True,null=True)
-    valid_to = models.DateTimeField()
+    valid_to = models.DateTimeField(null=True)
     discount = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(100)])
     coupon_type = models.CharField(choices=types,null=True,max_length=10)
     active = models.BooleanField()
@@ -90,7 +92,7 @@ class Order(models.Model):
         return str(self.id)
 
 
-
+    #total of cat products
     @property
     def get_cart_total(self):
         orderitem = self.orderitem_set.all()
@@ -137,3 +139,9 @@ class OrderItem(models.Model):
         return total
 
 
+class WishList(models.Model):
+    wish_user = models.ForeignKey(User,on_delete=models.CASCADE,null=True)
+    wish_product = models.ForeignKey(Product,on_delete=models.CASCADE,null=True)
+
+    def __str__(self):
+        return str(self.wish_product.id)

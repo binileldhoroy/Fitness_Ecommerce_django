@@ -1,0 +1,147 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="bs-example row">
+        <div class="col-md-4">
+
+            <div class="card" style="width: 18rem;">
+                <ul class="list-group list-group-flush" id="list">
+                    <a href="{% url 'my-profile' %}"><li class="list-group-item  side_section" value="sectionB">My Profile</li></a>
+                    <a href="{% url 'my-address' %}"><li class="list-group-item side_section" value="sectionA">Add Address</li></a>
+                    <a href="{% url 'my-wishlist' %}"><li class="list-group-item active side_section" value="sectionA">My Wishlist <span class="count">{{counts}}</span></li></a>
+                    <a href="{% url 'change-password' %}"><li class="list-group-item  side_section" value="sectionA">Change Password</li></a>
+                </ul>
+            </div>
+
+        </div>
+
+
+        <div class="col-md-8">
+            <div class="tab-content" >
+                <div id="section">
+                    
+                    <div class=" p-3 ">
+                        <div class="row shop-wthree-info text-center" id="filterproducts" >
+                            {% for product in products %}
+                            <div class="col-lg-4 shop-info-grid text-center mt-4" style="position: relative;" id="{{product.id}}">
+                                
+                                <div class="product-shoe-info shoe">
+                                       
+                                    <div class="btn {% if product.wish_product in wish %} wishlist {% else %} wishlist1 {% endif %}" 
+                                    id="wish1{{product.wish_product.id}}"   ><i value="{{product.wish_product.id}}" id="icon{{product.wish_product.id}}" 
+                                    class="wish_list {% if product.wish_product in wish %} wishlist {% else %} wishlist1 {% endif %}   
+                                    {% if product.wish_product in wish %} fa-solid {% else %} fa-regular {% endif %}  fa-heart"
+                                    ></i></div>
+                                    
+                                    <div class="men-thumb-item">
+                                        <img src="{{product.wish_product.imageUrl}}" class="img-fluid" style="height: 150px;" alt="">
+                
+                                    </div>
+                                    <div class="item-info-product">
+                                        <h4>
+                                            <a href="{% url 'product'  product.wish_product.id %}">{{product.wish_product.product_name|slice:":25"}}</a><small style="font-size: 12px;">more..</small>
+                                        </h4>
+                                        <div class="available mt-3">
+                                            <p>{{product.wish_product.category.name}} </p>
+                                        </div>
+                                        <div class="product_price">
+                                            <p>
+                                                {{product.wish_product.name}} 
+                                            </p>
+                                            <div class="grid-price">
+                                                <span class="money"> {{product.wish_product.product_discount_price| floatformat:2}}₹</span>
+                                                {% if product.wish_product.price > product.wish_product.product_discount_price %}
+                                                <strike class="money"> {{product.wish_product.price | floatformat:2}}₹</strike>
+                                                {% endif %}
+                                                <a href="{% url 'product' product.wish_product.id %}" class="btn btn-info btn-view btn-block btn-sm m-1">View</a>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                </div>
+                
+            </div>
+
+        </div>
+
+    </div>
+</div>
+<script>
+    $('.wish_list').on('click',function(e){
+        if('{{user}}' == 'AnonymousUser'){
+            var wish_product = $(this).data('product')
+            var wish_action = $(this).data('action')
+        }else{
+            var wish_product = $(this).attr('value')
+            var wish_action = ''
+            if ($(this).hasClass('wishlist')){
+                wish_action = 'remove_wish'
+            }else if($(this).hasClass('wishlist1')){
+                wish_action = 'add_wish'
+            }
+    
+            $.ajax({
+                method: "POST",
+                url: "/wish-list/", 
+                data: {
+                    wish_product : wish_product,
+                    wish_action : wish_action,  
+                    csrfmiddlewaretoken : "{{ csrf_token }}"
+                },
+                dataType: "json",
+                success: function (response) {
+                    var res = response.result
+                    var productId = response.productId
+                    var status = response.status
+                    console.log(res)
+                    console.log(productId)
+                    if(res=='added'){
+                        $('#'+productId+' #wish1'+productId).removeClass('wishlist1')
+                        $('#'+productId+' #wish1'+productId).addClass('wishlist')
+                        $('#'+productId+' #icon'+productId).removeClass('fa-regular')
+                        $('#'+productId+' #icon'+productId).addClass('fa-solid')
+                        $('#'+productId+' #icon'+productId).removeClass('wishlist1')
+                        $('#'+productId+' #icon'+productId).addClass('wishlist')
+                    }else if(res == 'removed'){
+                        $('#'+productId+' #wish1'+productId).removeClass('wishlist')
+                        $('#'+productId+' #wish1'+productId).addClass('wishlist1')
+                        $('#'+productId+' #icon'+productId).removeClass('fa-solid')
+                        $('#'+productId+' #icon'+productId).addClass('fa-regular')
+                        $('#'+productId+' #icon'+productId).removeClass('wishlist')
+                        $('#'+productId+' #icon'+productId).addClass('wishlist1')
+                    }
+                    
+                    var toastMixin = Swal.mixin({
+                        toast: true,
+                        icon: 'success',
+                        title: 'General Title',
+                        animation: false,
+                        position: 'bottom',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    });
+    
+                    toastMixin.fire({
+                        animation: true,
+                        title: 'Product '+ status +' WishList'
+                    })
+                    location.reload()
+                }
+            });
+        }
+    })
+    </script>
+
+{% endblock %}

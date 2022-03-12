@@ -8,6 +8,7 @@
                 <ul class="list-group list-group-flush" id="list">
                     <a href="{% url 'my-profile' %}"><li class="list-group-item  side_section" value="sectionB">My Profile</li></a>
                     <a href="{% url 'my-address' %}"><li class="list-group-item active side_section" value="sectionA">Add Address</li></a>
+                    <a href="{% url 'my-wishlist' %}"><li class="list-group-item  side_section" value="sectionA">My Wishlist <span class="count">{{counts}}</span></li></a>
                     <a href="{% url 'change-password' %}"><li class="list-group-item  side_section" value="sectionA">Change Password</li></a>
                 </ul>
             </div>

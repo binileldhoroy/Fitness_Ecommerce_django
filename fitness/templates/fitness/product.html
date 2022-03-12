@@ -145,6 +145,25 @@
                             $('#'+productId + ' #add_cart').hide();
                         }
                         $('#cart_items').html(items)
+                        var toastMixin = Swal.mixin({
+                                toast: true,
+                                icon: 'success',
+                                title: 'General Title',
+                                animation: false,
+                                position: 'bottom',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                }
+                            });
+
+                            toastMixin.fire({
+                                animation: true,
+                                title: 'Product added to Cart'
+                            })
                     }
                 });
             }

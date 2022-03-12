@@ -2057,3 +2057,29 @@ h3.sub-w3ls-headf {
 .whatsapp a{
     color: rgb(255, 255, 255) !important;
 }
+
+.wishlist{
+    top:5px !important; 
+    left: 10px !important; 
+    position: absolute !important; 
+    color: red !important; 
+    border: none !important; 
+    outline: none !important;
+}
+
+.wishlist1{
+    top:5px !important; 
+    left: 10px !important; 
+    position: absolute !important; 
+    border: 0 !important; 
+    outline: 0 !important;
+}
+
+.count{
+    width: 10px;
+    background-color: white;
+    color: #000;
+    padding: 5px;
+    margin-left: 5px;
+    box-shadow: 0px 0px 5px;
+}
