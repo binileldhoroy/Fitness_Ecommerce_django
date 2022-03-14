@@ -80,6 +80,7 @@ def otpVerify(request):
             username = user.username
             number = '+91' + str(phone)
             try:
+                status = None
                 status = otp_verify_code(request,number,otp)
             except TwilioRestException as e:
                 messages.error(request,e)
@@ -195,7 +196,11 @@ def otpVerifySignUp(request):
             except TwilioRestException as e:
                 messages.error(request,e)
             if status == 'approved':
-                user = User.objects.get(phone= phone_number)
+                try:
+                    user = User.objects.get(phone= phone_number)
+                except:
+                    messages.error(request,'SignUp failed Try again')
+                    return redirect('index')
                 user.is_active = True
                 user.save()
                 login(request,user)
