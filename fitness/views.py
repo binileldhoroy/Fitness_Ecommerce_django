@@ -112,7 +112,6 @@ def signupView(request, *args, **kwargs):
     not_active.delete()
     form = MyUserForm()
     code = kwargs.get('ref_code')
-    print(code)
     try:
         profile = Referral.objects.get(ref_code=code)
         request.session['ref_profile'] = profile.user.id
@@ -123,7 +122,6 @@ def signupView(request, *args, **kwargs):
             profile_id = request.session.pop('ref_profile')
         except:
             profile_id = None
-        print(profile_id)
         form = MyUserForm(request.POST)
         if form.is_valid():
             if profile_id is not None:
@@ -259,7 +257,6 @@ def home(request):
     maxPrice = Product.objects.aggregate(Max('price'))
     if max_price != None and min_price != None:
         products = Product.objects.filter(price__range=(min_price, max_price))
-        print(max_price,'...',min_price)
     else:    
         products = Product.objects.filter(
             Q(product_name__icontains=q)|
@@ -323,7 +320,6 @@ def filterData(request):
     maxPrice  = request.GET['maxPrice']
     # products = products.filter(price__lte=minPrice)
     products = products.filter(price__gte=maxPrice)
-    print(products)
     
     if len(category) > 0:
         products = products.filter(category__id__in=category).distinct()
@@ -385,7 +381,6 @@ def updateCartItem(request):
     user = request.user
     product = Product.objects.get(id=productId)
     cur_stock = product.stock
-    print('cur:-',cur_stock)
     order, created = Order.objects.get_or_create(user=user, order_status=False,buy_now=False)
 
     orderItem, created = OrderItem.objects.get_or_create(order=order,product=product)
@@ -437,7 +432,6 @@ def checkOut(request):
         except:
             order, created  = Order.objects.get_or_create(user = user,order_status=False,buy_now=False)
         items = order.orderitem_set.all()
-        print(items)
         coupon = Coupon.objects.all()
         ref = Referral.objects.get(user=user)
         ref_count = Referral.objects.filter(user=user).count()
@@ -505,10 +499,6 @@ def orderCancel(request,pk):
             product_id = item.product.id
             stock_updated = product_stock + item_quantity
             Product.objects.filter(id = product_id).update(stock = stock_updated)
-            print(item_quantity)
-            print('.....',product_stock)
-            print(product_id)
-            print('.....',stock_updated)
         return redirect('my-orders')
     else:
         messages.error(request,'Something went wrong')
@@ -559,7 +549,6 @@ def razorpayComplete(request):
 
         cur_address = request.POST.get('cur_address')
         # p_method = request.POST.get('payment')
-        print(cur_address)
         # print(p_method)
         address = user.shippingaddress_set.all()
         cur_order = Order.objects.get(id=order.id)
@@ -586,8 +575,6 @@ def razorpayComplete(request):
             product_id = item.product.id
             stock_updated = product_stock - item_quantity
             Product.objects.filter(id = product_id).update(stock = stock_updated)
-        # print(p_method)
-        print(add)
     
         return JsonResponse({'status':'Your order has placed successfully'}) 
 
@@ -680,7 +667,6 @@ class MyPasswordChangeView(PasswordChangeView):
     def get_context_data(self,*args, **kwargs):
         context = super( MyPasswordChangeView, self).get_context_data(*args,**kwargs)
         user = self.request.user
-        print(user)
         context['counts'] = WishList.objects.filter(wish_user=user).count()
         return context
 
@@ -722,7 +708,6 @@ def addWishList(request):
         if request.method == 'POST':
             productId = request.POST.get('wish_product')
             action = request.POST.get('wish_action')
-            print(productId,action)
             product = Product.objects.get(id=productId)
             if action == 'add_wish':
                 wishlist = WishList.objects.get_or_create(wish_user=user,wish_product=product)

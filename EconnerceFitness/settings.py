@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 from django.contrib.messages import constants as messages
+from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -82,10 +83,10 @@ WSGI_APPLICATION = 'EconnerceFitness.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME':'fitness_ecommerce',
-        'USER':'postgres',
-        'PASSWORD':'billiondollars',
-        'HOST':'localhost',
+        'NAME':config('database_name'),
+        'USER':config('database_user'),
+        'PASSWORD':config('database_password'),
+        'HOST':config('database_host'),
         'POST':'5432',
     }
 }

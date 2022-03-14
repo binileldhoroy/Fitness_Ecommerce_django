@@ -277,7 +277,6 @@ def orderDelivered(request,pk):
             order = Order.objects.get(id=pk)
             items = order.orderitem_set.all()
             payment = Payment.objects.filter(order=order).update(payment_status=True)
-            print(payment)
         else:
             messages.error(request,'Something went wrong')
             return render(request,'dashboard/view_items.html')
@@ -300,10 +299,6 @@ def orderCancelAdmin(request,pk):
             product_id = item.product.id
             stock_updated = product_stock + item_quantity
             Product.objects.filter(id = product_id).update(stock = stock_updated)
-            print(item_quantity)
-            print('.....',product_stock)
-            print(product_id)
-            print('.....',stock_updated)
         return redirect('order-list')
     else:
         messages.error(request,'Something went wrong')
@@ -332,15 +327,11 @@ def salesReport(request):
             ye1 = datestr[19:]
             s_date = ye+'-'+mo+'-'+da
             e_date = ye1+'-'+mo1+'-'+da1
-            print(s_date)
-            print('.......',e_date)
             month = request.POST.get('month')
             year = request.POST.get('year')
-            print(year)
             if month != '':
                 m = int(month[5:])
                 orders = orders.filter(date__month=m).filter(payment__payment_status=True)
-                print(orders)
             elif year != '':
                 y = int(year)
                 orders = orders.filter(date__year=y).filter(payment__payment_status=True)
@@ -368,7 +359,6 @@ def exportCsv(request):
     writer.writerow(['Order Id','Date','Payment Method','Items','Total Amount'])
     try:
         report_total = 0
-        print(orders)
         for order in orders:
             writer.writerow([order.id,order.date,order.payment.payment_method,order.get_cart_items,order.payment.payment_amount])
             report_total = report_total + order.payment.payment_amount
@@ -436,7 +426,6 @@ def addCoupon(request):
         if request.method == 'POST':
             form = CouponForm(request.POST)
             coupon_date = request.POST.get('coupon_date')
-            print(coupon_date)
             if form.is_valid():
                 instance = form.save(commit=False)
                 instance.valid_to = coupon_date
