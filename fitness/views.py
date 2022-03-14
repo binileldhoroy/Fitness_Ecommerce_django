@@ -24,7 +24,7 @@ from .cookie_cart import cookieCart
 def loginView(request):
     page = 'login-page'
     if request.user.is_authenticated:
-        return redirect('home')
+        return redirect('index')
     if request.method == 'POST':
         not_active = User.objects.filter(is_active=False)
         not_active.delete()
@@ -38,7 +38,7 @@ def loginView(request):
             user = authenticate(request,username=uname,password=password)
             if user is not None:
                 login(request,user)
-                return redirect('home')
+                return redirect('index')
             else:
                 messages.error(request,'invalid username/password')
         else:
@@ -87,7 +87,7 @@ def otpVerify(request):
                 if user.adminstatus == False :
                     login(request,user)
                    
-                    return redirect('home')
+                    return redirect('index')
                 else:
                     messages.error(request,"You seems blocked try again later")
             else:
@@ -103,7 +103,7 @@ def otpVerify(request):
 @never_cache
 def logoutView(request):
     logout(request)
-    return redirect('home')
+    return redirect('index')
 
 @never_cache
 def signupView(request, *args, **kwargs):
@@ -199,7 +199,7 @@ def otpVerifySignUp(request):
                 user.is_active = True
                 user.save()
                 login(request,user)
-                return redirect('home')
+                return redirect('index')
             else:
                 
                 messages.error(request,"Incorrect OTP ")
@@ -267,6 +267,48 @@ def home(request):
             'maxPrice':maxPrice
             }
     return render(request,'fitness/home.html',context)
+
+
+def index(request):
+    cart_item = False
+    user = request.user
+    try:
+        wish = [i.wish_product for i in  WishList.objects.filter(wish_user=user)]
+    except:
+        wish=''
+    if request.user.is_authenticated:
+        try:
+            cart = json.loads(request.COOKIES['cart'])
+        except:
+            cart = {}
+
+        
+        if bool(cart):
+            order, created  = Order.objects.get_or_create(user = user,order_status=False,buy_now=False)
+            for i in cart:
+                product = Product.objects.get(id=i)
+                try:
+                    item = OrderItem.objects.get(product=product, order=order)
+                except:
+                    item = OrderItem.objects.create(product=product,order=order,quantity=0)
+                quantity = int(item.quantity) + cart[i]['quantity']
+                OrderItem.objects.filter(product=product, order=order).update(quantity=quantity)
+                cart_item = True
+        else:
+            order, created  = Order.objects.get_or_create(user = user,order_status=False,buy_now=False)
+        
+    else:
+        cookieData = cookieCart(request)
+        order = cookieData['order']
+    
+       
+    products = Product.objects.all().order_by('-id')[:4]
+    banners = Banner.objects.all().order_by('id')
+    context = {'products':products,
+            'cart_item':cart_item,'banners':banners,
+            'order':order,'wish':wish
+            }
+    return render(request,'fitness/index.html',context)
 
 
 def filterData(request):

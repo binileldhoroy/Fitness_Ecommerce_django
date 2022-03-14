@@ -1,3 +1,4 @@
+from asyncio import proactor_events
 from django.db import models
 from fitness.models import User,ShippingAddress
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -145,3 +146,18 @@ class WishList(models.Model):
 
     def __str__(self):
         return str(self.wish_product.id)
+
+
+class Banner(models.Model):
+    banner_title = models.CharField(max_length=100,null=True)
+    banner_image = models.ImageField(upload_to='images',null=True,default='images/slider.svg')
+    banner_description = models.CharField(max_length=100,null=True)
+    active = models.BooleanField(default=True,null=True)
+
+    @property
+    def bannerImageUrl(self):
+        try:
+            url = self.banner_image.url
+        except:
+            url = ''
+        return url

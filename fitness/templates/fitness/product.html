@@ -56,7 +56,7 @@
                                     {% else %}
                                     <li><button id="test" data-product="{{product.id}}" data-action="add" class="btn btn-info btn-view btn-cart btn-block btn-sm m-1 add-btn update-cart">Add to Cart</button></li>
                                     {% endif %}
-                                    <li><a href="{% url 'buy-now' product.id %}" class="btn btn-info btn-view btn-block btn-sm m-1">By Now</a></li>
+                                    <li><a href="{% if product.stock != 0 %}{% url 'buy-now' product.id %} {% endif %}" class="btn btn-info btn-view btn-block btn-sm m-1">By Now</a></li>
                                 </ul>
                             </div>
                         </div>

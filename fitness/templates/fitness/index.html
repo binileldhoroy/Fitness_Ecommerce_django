@@ -3,37 +3,42 @@
 {% block content %}
 {% load static %}
 
-
-<script type="text/javascript" src="{% static 'fitness/js/product-filter.js' %}"></script>
-<!-- <img src="{% static 'fitness/images/DoubleRing.gif' %}" style="background: no-repeat; background: center;" alt="" id="loader"> -->
-<section class="banner-bottom py-5">
-    <div class=" container-fluid py-5">
-        <h3 class="title-wthree mb-lg-5 mb-4 text-center">Shop Now</h3>
-<div class="row">
-    <div class="col-md-3">
-        <div class="card mt-4">
-
-
-            <div class="card mb-4">
-				<h6 class="card-header">Categories</h6>
-				<div class="list-group list-group-flush">
-					{% for cat in cats %}
-					<li class="list-group-item">
-						<a href="{% url 'home' %}?q={{cat.name}}"><input class="filter-checkbox form-control" style="outline: none; border: none; background-color: white;" data-filter="category" value="{{cat.name}}" type="text" disabled /></a>
-						
-					</li>
-					{% endfor %}
-				</div>
-			</div>
-
-            <!-- Price Filter -->
-			<div class="card mb-4">
-				{% include 'fitness/pricerange.html' %}
-                </div>
-
-        </div>
+<!-- Home carousel start -->
+<div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        {% for banner in banners %}
+      <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first  %} active {% endif %}" aria-current="true" aria-label="{{ forloop.counter0 }}"></button>
+        {% endfor %}
     </div>
-    <div class="col-md-9">
+    <div class="carousel-inner">
+        {% for banner in banners %}
+      <div id="{{banner.id}}" class="carousel-item {% if forloop.first  %} active {% endif %}">
+        <img src="{{banner.bannerImageUrl}}" class="d-block w-100" alt="...">
+        <div class="carousel-caption d-none d-md-block">
+          <h3>{{banner.banner_title}}</h3>
+          <p style="font-size: medium;">{{ banner.banner_description }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+<!-- Home carousel end -->
+    
+    <section class="banner-bottom py-5">
+
+    <div class=" container py-5">
+        <h3 class="title-wthree mb-lg-5 mb-4 text-center">New Arrivals</h3>
+<div class="row">
+   
+    <div class="col-md-12">
 
                 <!--/row-->
                 <div class="row shop-wthree-info text-center" id="filterproducts" >
@@ -84,7 +89,6 @@
         </div>
     </div>
 </section>
-
 <script>
 $('.wish_list').on('click',function(e){
     if('{{user}}' == 'AnonymousUser'){
@@ -172,5 +176,8 @@ $('.wish_list').on('click',function(e){
         });
     }
 })
+
+
 </script>
+
 {% endblock %}

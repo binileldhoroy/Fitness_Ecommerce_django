@@ -115,7 +115,7 @@
             
             <div id="logo">
               <h1>
-                <a href="{% url 'home' %}"
+                <a href="{% url 'index' %}"
                   ><span class="log-w3pvt">F</span>itness</a
                 >
                 <label class="sub-des">Online Store </label>
@@ -150,7 +150,8 @@
               ></label>
               <input type="checkbox" id="drop" />
               <ul class="menu">
-                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'index' %}">Home</a></li>
+                <li><a href="{% url 'home' %}">Shop</a></li>
                 {% if request.user.is_authenticated %}
                 <li><a href="{% url 'my-profile' %}">My Profile</a></li>
                 <li><a href="{% url 'my-orders' %}">My Orders</a></li>
@@ -166,7 +167,7 @@
             <!-- //nav -->
             <div class="search-form ml-auto">
               <div class="form-w3layouts-grid">
-                <form action="{% url 'home' %}" method="GET" class="newsletter">
+                <form action="{% url 'index' %}" method="GET" class="newsletter">
                   <input
                     class="search"
                     type="search"
@@ -238,14 +239,14 @@
         <div class="row">
           <div class="col-lg-3 footer_wthree_gridf mt-lg-5">
             <h2>
-              <a href="{% url 'home' %}"><span>F</span>itness </a>
+              <a href="{% url 'index' %}"><span>F</span>itness </a>
             </h2>
             <label class="sub-des2">Online Store</label>
           </div>
           <div class="col-lg-3 footer_wthree_gridf mt-md-0 mt-4">
             <ul class="footer_wthree_gridf_list">
               <li>
-                <a href="{% url 'home' %}"
+                <a href="{% url 'index' %}"
                   ><span class="fa fa-angle-right" aria-hidden="true"></span>
                   Home</a
                 >
@@ -257,7 +258,7 @@
                 >
               </li>
               <li>
-                <a href="{% url 'home' %}"
+                <a href="{% url 'index' %}"
                   ><span class="fa fa-angle-right" aria-hidden="true"></span
                   >Collections</a
                 >
@@ -338,6 +339,7 @@
     </div>
     <!-- //copyright -->
 
+    <script src="{% static 'fitness/js/zoom/jquery.flexslider.js' %}"></script>
 
     <script src="{% static 'fitness/js/zoom/jquery-2.2.3.min.js' %}"></script>
     <script src="{% static 'fitness/js/zoom/modernizr-2.6.2.min.js' %}"></script>
@@ -350,7 +352,6 @@
     <script src="{% static 'fitness/js/checkout.js' %}"></script>
     <!-- <script src="{% static 'fitness/js/cart.js' %}"></script> -->
 
-    <script src="{% static 'fitness/js/zoom/jquery.flexslider.js' %}"></script>
     <script>
       // Can also be used with $(document).ready()
       $(window).load(function () {
