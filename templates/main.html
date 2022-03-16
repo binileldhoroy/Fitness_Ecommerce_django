@@ -167,7 +167,7 @@
             <!-- //nav -->
             <div class="search-form ml-auto">
               <div class="form-w3layouts-grid">
-                <form action="{% url 'index' %}" method="GET" class="newsletter">
+                <form action="{% url 'home' %}" method="GET" class="newsletter">
                   <input
                     class="search"
                     type="search"
@@ -286,6 +286,10 @@
 
           <div class="col-lg-3 footer_wthree_gridf mt-md-0 mt-sm-4 mt-3">
             <ul class="footer_wthree_gridf_list">
+              {% if request.user.is_authenticated %}
+
+              {% else %}
+              
               <li>
                 <a href="{% url 'login' %}"
                   ><span class="fa fa-angle-right" aria-hidden="true"></span>
@@ -299,6 +303,7 @@
                   >Register</a
                 >
               </li>
+              {% endif %}
               <li>
                 <a href=""
                   ><span class="fa fa-angle-right" aria-hidden="true"></span
@@ -352,16 +357,6 @@
     <script src="{% static 'fitness/js/checkout.js' %}"></script>
     <!-- <script src="{% static 'fitness/js/cart.js' %}"></script> -->
 
-    <script>
-      // Can also be used with $(document).ready()
-      $(window).load(function () {
-        $(".flexslider1").flexslider({
-          animation: "slide",
-          controlNav: "thumbnails",
-        });
-      });
-    </script>
-    <script src="{% static 'fitness/js/zoom/bootstrap.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
   </body>

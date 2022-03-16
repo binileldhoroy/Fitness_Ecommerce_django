@@ -93,6 +93,12 @@ header a.btn {
     outline: none;
 }
 
+header a.btn:hover {
+    
+    color: #e0dadc;
+    
+}
+
 header a.btn span {
     color: #fff;
 }

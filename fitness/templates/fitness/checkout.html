@@ -75,8 +75,8 @@
             {{ coupon.code }}
             <p style="color: rgb(253, 122, 122);">Referral Coupon Get upto {{coupon.discount}}% offer</p>
             {% endif %}
-          {% elif ref_count > 0 %}
-          {% if coupon.coupon_type == 'ref' %}
+          {% elif ref_count > 1 %}
+            {% if coupon.coupon_type == 'ref' %}
             {{ coupon.code }}
             <p style="color: rgb(253, 122, 122);">Referral Coupon Get upto {{coupon.discount}}% offer</p>
             {% endif %}

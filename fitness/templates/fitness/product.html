@@ -2,38 +2,41 @@
 
 {% block content %}
 {% load static %}
+<link rel="stylesheet" href="https://unpkg.com/xzoom/dist/xzoom.css">
 <section class="banner-bottom py-5">
     <div class="container py-md-5">
         <!-- product right -->
         <div class="left-ads-display wthree">
             <div class="row">
+
+
+
                 <div class="desc1-left col-md-6">
-                    <!-- <img src="{{product.image1.url}}" class="img-fluid" id="img"  alt=""> -->
+                    <img class="xzoom" src="{{ product.image1.url }}" xoriginal="{{ product.image1.url }}" />
 
-    <div class="col-lg-11 single-right-left ">
-            <div class="grid images_3_of_2">
-                <div class="flexslider1">
+                        
+                        <div class="xzoom-thumbs mt-3" style="margin-right: 245px;">
+                            <a href="{{ product.image1.url }}">
+                              <img class="xzoom-gallery" width="80" src="{{ product.image1.url }}"  ">
+                            </a>
+                            <a href="{{ product.image2.url }}">
+                              <img class="xzoom-gallery" width="80" src="{{ product.image2.url }}">
+                            </a>
+                            <a href="{{ product.image3.url }}">
+                              <img class="xzoom-gallery" width="80" src="{{ product.image3.url }}">
+                            </a>
+                          </div>
 
-                    <ul class="slides text-center">
-                        <li data-thumb="{{ product.image1.url }}" >
-                            <div class="thumb-image" > <img src="{{ product.image1.url }}" data-imagezoom="true" class="img-fluid" height:"30px" alt=" "> </div>
-                        </li>
-                        <li data-thumb="{{ product.image2.url }}">
-                            <div class="thumb-image"> <img src="{{ product.image2.url }}" data-imagezoom="true" class="img-fluid" alt=" "> </div>
-                        </li>
-                        <li data-thumb="{{ product.image3.url }}">
-                            <div class="thumb-image"> <img src="{{ product.image3.url }}" data-imagezoom="true" class="img-fluid" alt=" "> </div>
-                        </li>
-                    </ul>
-                    <div class="clearfix"></div>
-                </div>
-            </div>
-        </div>  
+     
     </div>
-                <div class="desc1-right col-md-6 pl-lg-3" id="{{product.id}}">
+
+
+
+
+    <div class="desc1-right col-md-6 pl-lg-3" id="{{product.id}}">
                     <h3>{{product.product_name}}</h3>
                     {% if product.price > product.product_discount_price %}
-                        <strike class="money"> {{product.price | floatformat:2}}₹</strike>
+                    <strike class="money"> {{product.price | floatformat:2}}₹</strike>
                     {% endif %}
                     <h5>Rs. {{product.product_discount_price | floatformat:2}}₹</h5>
                     <div class="available mt-3">
@@ -78,11 +81,11 @@
                             <h4>
                                 <a href="{% url 'product' re_product.id %}">{{re_product.product_name|slice:":30"}} </a><small style="font-size: 12px;">more..</small>
                             </h4>
-
+                            
                             <div class="product_price">
                                 <div class="grid-price">
                                     {% if re_product.price > re_product.product_discount_price %}
-                                        <strike class="money"> {{re_product.price | floatformat:2}}₹</strike>
+                                    <strike class="money"> {{re_product.price | floatformat:2}}₹</strike>
                                     {% endif %}
                                     <span class="money"> {{re_product.product_discount_price| floatformat:2}}₹</span>
                                     <a href="{% url 'product' re_product.id %}" class="btn btn-info btn-view btn-block btn-sm m-1">View</a>
@@ -93,18 +96,22 @@
                     </div>
                 </div>
                 {% endfor %}
-
+                
             </div>
             <!--//row-->
-
+            
         </div>
     </div>
 </section>
+
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script> -->
+<script src="https://unpkg.com/xzoom/dist/xzoom.min.js"></script>
 <script>
-  
-  $('.update-cart').on('click',function (e) {
-    if('{{ user }}' == 'AnonymousUser'){ 
+    
+    $('.update-cart').on('click',function (e) {
+        if('{{ user }}' == 'AnonymousUser'){ 
 				var productId = $(this).data('product')
 				var action = 'add'
 				  if (action == 'add'){
@@ -170,5 +177,8 @@
     });
   
 			
+</script>
+<script>
+    $(".xzoom, .xzoom-gallery").xzoom({tint: '#333', Xoffset: 15});
 </script>
 {% endblock %}

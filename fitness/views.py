@@ -441,6 +441,7 @@ def checkOut(request):
                 ref_user = ''
         except:
             ref_user = ''
+        print(ref_user)
         address = user.shippingaddress_set.all()
         if request.method == 'POST':
             cur_address = request.POST.get('adrress')
