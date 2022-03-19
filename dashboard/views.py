@@ -14,6 +14,7 @@ import csv
 import xlwt
 from django.template.loader import get_template
 from django.db.models import Q
+from django.core.paginator import Paginator
 
 # Create your views here.
 @never_cache
@@ -128,10 +129,14 @@ def addProduct(request):
 def viewProduct(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
     if request.user.username == 'binil':
-        products = Product.objects.filter(
+        product = Product.objects.filter(
         Q(product_name__icontains=q)|
         Q(description__icontains=q)|
         Q(category__name__icontains=q))
+
+        paginator = Paginator(product, 10) # Show 25 contacts per page.
+        page_number = request.GET.get('page')
+        products = paginator.get_page(page_number)
     else:
         return redirect('login')
     return render(request,'dashboard/view_product.html',{'products':products})
@@ -165,6 +170,18 @@ def deleteProduct(request,pk):
     else:
         return redirect('login')
     return render(request,'dashboard/delete_product.html')
+
+
+@never_cache
+@login_required(login_url='admin-login')
+def deleteCoupon(request,pk):
+    if request.user.username == 'binil':
+        coupon = Coupon.objects.get(id=pk)
+        coupon.delete()
+        return redirect('add-coupon')
+    else:
+        return redirect('login')
+    
 
 @never_cache
 @login_required(login_url='admin-login')
@@ -206,7 +223,10 @@ def editCategory(request,pk):
 def viewOrders(request):
     if request.user.username == 'binil':
         if request.user.is_authenticated:
-            orders = Order.objects.all().filter(order_status=True)
+            order = Order.objects.all().filter(order_status=True)
+            paginator = Paginator(order, 15)
+            page_number = request.GET.get('page')
+            orders = paginator.get_page(page_number)
         else:
             messages.error(request,'Empty Orders')
             return render(request,'dashboard/view_orders.html')
@@ -274,6 +294,7 @@ def orderDelivered(request,pk):
     if request.user.username == 'binil':
         if request.user.is_authenticated:
             Order.objects.filter(id=pk).update(delivery_status=True)
+            Order.objects.filter(id=pk).update(delivery_date=datetime.now())
             order = Order.objects.get(id=pk)
             items = order.orderitem_set.all()
             payment = Payment.objects.filter(order=order).update(payment_status=True)
@@ -302,7 +323,21 @@ def orderCancelAdmin(request,pk):
         return redirect('order-list')
     else:
         messages.error(request,'Something went wrong')
-        return render(request,'fitness/myorders.html')
+
+def returnOrderView(request):
+    if request.user.username == 'binil':
+        if request.user.is_authenticated:
+            order = Order.objects.all().filter(return_status=True)
+            paginator = Paginator(order, 15)
+            page_number = request.GET.get('page')
+            orders = paginator.get_page(page_number)
+        else:
+            messages.error(request,'Empty Orders')
+            return render(request,'dashboard/return_orders.html')
+        context = {'orders':orders}
+    else:
+        return redirect('login')
+    return render(request,'dashboard/return_orders.html',context)
 
 
 @never_cache
@@ -340,7 +375,8 @@ def salesReport(request):
                 return redirect('sales-report')
             else:
                 orders = orders.filter(date__range=[s_date,e_date]).filter(payment__payment_status=True)
-            context = {'orders':orders,'yr':yr}
+            order_count = orders.count()
+            context = {'orders':orders,'yr':yr,'order_count':order_count}
             return render(request,'dashboard/sales_report.html',context)
 
         context = {'orders':orders,'yr':yr}
@@ -435,3 +471,24 @@ def addCoupon(request):
     else:
         return redirect('login')
     return render(request,'dashboard/add_coupon.html',context)
+
+
+@never_cache
+@login_required(login_url='admin-login')
+def editCoupon(request,pk):
+    if request.user.username == 'binil':
+        coupon = Coupon.objects.get(id=pk)
+        form = CouponForm(instance=coupon)
+        if request.method == 'POST':
+            form = CouponForm(request.POST,instance=coupon)
+            coupon_date = request.POST.get('coupon_date')
+            if form.is_valid():
+                coup = form.save(commit=False)
+                coup.valid_to = coupon_date
+                coup.save()
+                messages.success(request,'Update Successfully')
+                return redirect('add-coupon')
+        
+        return render(request,'dashboard/edit_coupon.html',{'form':form})
+    else:
+        return redirect('login')

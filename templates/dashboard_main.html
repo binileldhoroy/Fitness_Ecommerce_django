@@ -23,6 +23,15 @@
     <link href="{% static 'dashboard/css/pages/dashboard1.css' %}" rel="stylesheet">
     <!-- You can change the theme colors from here -->
     <link href="{% static 'dashboard/css/colors/default.css' %}" id="theme" rel="stylesheet">
+
+    <!-- sweetalert2 -->
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/sweetalert2@10.10.1/dist/sweetalert2.min.css'>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.10.1/dist/sweetalert2.all.min.js"></script>
+    <!-- sweetalert2 -->
+    <!-- sweetalert1 -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <!-- sweetalert1 -->
    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -156,6 +165,8 @@
                         <li> <a class="waves-effect waves-dark" href="{% url 'sales-report' %}" aria-expanded="false"><i class="fa fa-calendar" ></i><span class="hide-menu">Sales Report</span></a>
                         </li>
                         <li> <a class="waves-effect waves-dark" href="{% url 'add-coupon' %}" aria-expanded="false"><i class="fa-solid fa-percent"></i><span class="hide-menu">Add Coupon</span></a>
+                        </li>
+                        <li> <a class="waves-effect waves-dark" href="{% url 'return-view' %}" aria-expanded="false"><i class="fa-solid fa-percent"></i><span class="hide-menu">Return Order List</span></a>
                         </li>
                         
                     </ul>

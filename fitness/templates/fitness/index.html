@@ -56,7 +56,7 @@
                             <!-- <div class="btn " id="wish2" ><i class=" fa-heart wish" data-product="{{product.id}}" data-action="add_wish"></i></div> -->
                             
                             <div class="men-thumb-item">
-                                <img src="{{product.imageUrl}}" class="img-fluid" style="height: 150px;" alt="">
+                                <img src="{{product.image1Url}}" class="img-fluid" style="height: 150px;" alt="">
         
                             </div>
                             <div class="item-info-product">
@@ -96,7 +96,7 @@ $('.wish_list').on('click',function(e){
         var wish_action = $(this).data('action')
         var toastMixin = Swal.mixin({
                     toast: true,
-                    icon: 'success',
+                    icon: 'error',
                     title: 'General Title',
                     animation: false,
                     position: 'bottom',
@@ -135,6 +135,7 @@ $('.wish_list').on('click',function(e){
                 var res = response.result
                 var productId = response.productId
                 var status = response.status
+                var msg = response.msg
                 console.log(res)
                 console.log(productId)
                 if(res=='added'){
@@ -155,7 +156,7 @@ $('.wish_list').on('click',function(e){
 
                 var toastMixin = Swal.mixin({
                     toast: true,
-                    icon: 'success',
+                    icon: msg,
                     title: 'General Title',
                     animation: false,
                     position: 'bottom',

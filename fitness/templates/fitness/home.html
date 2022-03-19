@@ -44,14 +44,17 @@
                                
                             <div class="btn {% if product in wish %} wishlist {% else %} wishlist1 {% endif %}" 
                             id="wish1{{product.id}}"><i value="{{product.id}}" id="icon{{product.id}}" 
-                            class="wish_list {% if product in wish %} wishlist {% else %} wishlist1 {% endif %}   
+                            class="wish_list btn {% if product in wish %} wishlist {% else %} wishlist1 {% endif %}   
                             {% if product in wish %} fa-solid {% else %} fa-regular {% endif %}  fa-heart"
                             ></i></div>
                             
                             <!-- <div class="btn " id="wish2" ><i class=" fa-heart wish" data-product="{{product.id}}" data-action="add_wish"></i></div> -->
                             
                             <div class="men-thumb-item">
-                                <img src="{{product.imageUrl}}" class="img-fluid" style="height: 150px;" alt="">
+                                <a href="{% url 'product' product.id %}">
+                                    <img src="{{product.image1Url}}" class="img-fluid" style="height: 150px;" alt="">
+                                </a>
+                                
         
                             </div>
                             <div class="item-info-product">
@@ -90,25 +93,20 @@ $('.wish_list').on('click',function(e){
     if('{{user}}' == 'AnonymousUser'){
         var wish_product = $(this).data('product')
         var wish_action = $(this).data('action')
-        var toastMixin = Swal.mixin({
-                    toast: true,
-                    icon: 'success',
-                    title: 'General Title',
-                    animation: false,
-                    position: 'bottom',
-                    showConfirmButton: false,
-                    timer: 2000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer)
-                        toast.addEventListener('mouseleave', Swal.resumeTimer)
-                    }
-                });
-
-                toastMixin.fire({
-                    animation: true,
-                    title: 'You should SignUp/Login'
-                })
+        Swal.fire({
+          toast: true,
+          title: "You should SignUp/Login!",
+          icon: "error",
+          animation: false,
+          position: "bottom",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener("mouseenter", Swal.stopTimer);
+            toast.addEventListener("mouseleave", Swal.resumeTimer);
+          },
+        });
     }else{
         var wish_product = $(this).attr('value')
         var wish_action = ''
@@ -131,6 +129,7 @@ $('.wish_list').on('click',function(e){
                 var res = response.result
                 var productId = response.productId
                 var status = response.status
+                var msg = response.msg
                 console.log(res)
                 console.log(productId)
                 if(res=='added'){
@@ -151,7 +150,7 @@ $('.wish_list').on('click',function(e){
 
                 var toastMixin = Swal.mixin({
                     toast: true,
-                    icon: 'success',
+                    icon: msg,
                     title: 'General Title',
                     animation: false,
                     position: 'bottom',

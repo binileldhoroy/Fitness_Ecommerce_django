@@ -39,7 +39,7 @@
                                     {% if user.adminstatus %}
                                     <a href="{% url 'user-block' user.id %}" class="btn btn-success btn-block btn-sm m-1">Unblock</a>
                                     {% else %}
-                                    <a href="{% url 'user-block' user.id %}" class="btn btn-danger btn-block btn-sm m-1">Block</a>
+                                    <a href="{% url 'user-block' user.id %}" class="btn btn-danger btn-block btn-sm m-1"  onclick="return two(this,event)">Block</a>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -51,4 +51,28 @@
         </div>
     </div>
 </div>
+<script>
+    function two(url,e) {
+        e.preventDefault()
+        swal({
+            title: "Are you sure?",
+            text: "Do you want to block this user!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((willDelete) => {
+            if (willDelete) {
+        
+            window.location.href= url.href
+         
+
+            } else {
+              swal("User is not Blocked!");
+            }
+          });
+
+
+}
+</script>
 {% endblock %}

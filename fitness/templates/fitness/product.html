@@ -7,23 +7,19 @@
     <div class="container py-md-5">
         <!-- product right -->
         <div class="left-ads-display wthree">
-            <div class="row">
+            <div class="row">               
+                <div class="desc1-left col-md-8 col-lg-6">
+                    <img class="xzoom" src="{{ product.image1.url }}" width="400"  xoriginal="{{ product.image1.url }}" />
 
-
-
-                <div class="desc1-left col-md-6">
-                    <img class="xzoom" src="{{ product.image1.url }}" xoriginal="{{ product.image1.url }}" />
-
-                        
                         <div class="xzoom-thumbs mt-3" style="margin-right: 245px;">
-                            <a href="{{ product.image1.url }}">
-                              <img class="xzoom-gallery" width="80" src="{{ product.image1.url }}"  ">
+                            <a href="{{ product.image1Url }}">
+                              <img class="xzoom-gallery" width="80" src="{{ product.image1Url }}"  xpreview="{{ product.image1Url }}">
                             </a>
-                            <a href="{{ product.image2.url }}">
-                              <img class="xzoom-gallery" width="80" src="{{ product.image2.url }}">
+                            <a href="{{ product.image2Url }}">
+                              <img class="xzoom-gallery" width="80" src="{{ product.image2Url }}" xpreview="{{ product.image2Url }}"">
                             </a>
-                            <a href="{{ product.image3.url }}">
-                              <img class="xzoom-gallery" width="80" src="{{ product.image3.url }}">
+                            <a href="{{ product.image3Url }}">
+                              <img class="xzoom-gallery" width="80" src="{{ product.image3Url }}" xpreview="{{ product.image3Url }}">
                             </a>
                           </div>
 
@@ -33,7 +29,7 @@
 
 
 
-    <div class="desc1-right col-md-6 pl-lg-3" id="{{product.id}}">
+    <div class="desc1-right col-md-4 pl-lg-3" id="{{product.id}}">
                     <h3>{{product.product_name}}</h3>
                     {% if product.price > product.product_discount_price %}
                     <strike class="money"> {{product.price | floatformat:2}}₹</strike>
@@ -58,8 +54,8 @@
                                     <li><span style=" color: red;">Out Of Stock</span></li>
                                     {% else %}
                                     <li><button id="test" data-product="{{product.id}}" data-action="add" class="btn btn-info btn-view btn-cart btn-block btn-sm m-1 add-btn update-cart">Add to Cart</button></li>
+                                    <li><a href="{% if product.stock != 0 %}{% url 'buy-now' product.id %} {% endif %}" class="btn btn-info btn-view btn-block btn-sm m-1">Buy Now</a></li>
                                     {% endif %}
-                                    <li><a href="{% if product.stock != 0 %}{% url 'buy-now' product.id %} {% endif %}" class="btn btn-info btn-view btn-block btn-sm m-1">By Now</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -105,8 +101,8 @@
 </section>
 
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script> -->
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script src="https://unpkg.com/xzoom/dist/xzoom.min.js"></script>
 <script>
     

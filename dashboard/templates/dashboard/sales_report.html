@@ -50,6 +50,7 @@
                 </ul>
               </div>
               <br>
+              {% if order_count > 0 %}
               <table class="table table-striped" id="reporttable">
                 <thead>
                     <tr>
@@ -76,7 +77,11 @@
                     {% endfor %}
                 </tbody>
             </table>
-                
+            {% else %}
+            <div class=" text-center">
+              <img src="{% static 'dashboard/images/no-data-found.gif' %}" class="image-fluid" alt="">
+            </div>
+            {% endif %}
             </div>
         </div>
     </div>

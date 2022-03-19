@@ -12,16 +12,16 @@ class Category(models.Model):
         return self.name
 
 class Product(models.Model):
-    product_name = models.CharField(max_length=100,null=True)
+    product_name = models.CharField(max_length=100,null=True,unique=True)
     description = models.TextField(null=True)
     price = models.FloatField()
     size = models.CharField(max_length=50,null=True)
-    image1 = models.ImageField(upload_to='images',blank=True ,null=True)
-    image2 = models.ImageField(upload_to='images',blank=True ,null=True)
-    image3 = models.ImageField(upload_to='images',blank=True ,null=True)
+    image1 = models.ImageField(upload_to='images',null=True)
+    image2 = models.ImageField(upload_to='images',null=True)
+    image3 = models.ImageField(upload_to='images',null=True)
     category = models.ForeignKey(Category,on_delete=models.SET_NULL,null=True)
     stock = models.PositiveBigIntegerField(default=0,null=True)
-    product_discount = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(100)],null=True,blank=True)
+    product_discount = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(100)],null=True)
     update = models.DateTimeField(auto_now=True,null=True)
     created = models.DateTimeField(auto_now_add=True,null=True)
 
@@ -33,9 +33,25 @@ class Product(models.Model):
 
     #if image url not fount
     @property
-    def imageUrl(self):
+    def image1Url(self):
         try:
             url = self.image1.url
+        except:
+            url = ''
+        return url
+
+    @property
+    def image2Url(self):
+        try:
+            url = self.image2.url
+        except:
+            url = ''
+        return url
+
+    @property
+    def image3Url(self):
+        try:
+            url = self.image3.url
         except:
             url = ''
         return url
@@ -65,7 +81,7 @@ class Coupon(models.Model):
         ('ref','REF')
     )
     code = models.CharField(max_length=6,unique=True,null=True)
-    valid_to = models.DateTimeField(null=True)
+    valid_to = models.DateTimeField(null=True,blank=True)
     discount = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(100)])
     coupon_type = models.CharField(choices=types,null=True,max_length=10)
     active = models.BooleanField()
@@ -84,6 +100,8 @@ class Order(models.Model):
     shipped_status = models.BooleanField(default=False)
     cancel_status = models.BooleanField(default=False)
     delivery_status = models.BooleanField(default=False)
+    delivery_date = models.DateField(null=True)
+    return_status = models.BooleanField(default=False)
     coupon = models.ForeignKey(Coupon,on_delete=models.SET_NULL,null=True, blank=True)
     buy_now = models.BooleanField(default=False,null=True)
 

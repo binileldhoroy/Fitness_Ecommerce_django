@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 from django.contrib.messages import constants as messages
 from decouple import config
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ske$ik$msphn0oxq+@%k0^2sqr27^frh*on+gyucr31&wq9q(('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*','3.86.182.123','ec2-3-86-182-123.compute-1.amazonaws.com']
 
@@ -127,12 +128,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
-
-STATICFILES_DIRS = [
-    BASE_DIR / 'static'
-]
-
 MEDIA_URL = '/media/'
+
+
+STATICFILES_DIRS = [BASE_DIR, 'static']
+
+
 MEDIA_ROOT = BASE_DIR / 'media/'
 
 # Default primary key field type

@@ -1,7 +1,29 @@
 {% extends 'main.html' %}
 
 {% block content %}
-
+{% for message in messages %}
+<script>
+    if('{{ message.tags }}' == 'alert-danger'){
+        var alert = 'error'
+    }else if('{{ message.tags }}' == 'alert-success'){
+        var alert = 'success'
+    }
+    Swal.fire({
+          toast: true,
+          title: "{{ message | safe }}!",
+          icon: alert,
+          animation: false,
+          position: "bottom",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener("mouseenter", Swal.stopTimer);
+            toast.addEventListener("mouseleave", Swal.resumeTimer);
+          },
+        });
+</script>
+{% endfor %}
      <!--/login -->
      <section class="banner-bottom py-5">
         {% if page == 'login-page' %}

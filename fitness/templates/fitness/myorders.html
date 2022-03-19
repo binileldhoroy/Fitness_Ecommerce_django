@@ -17,10 +17,21 @@
                 {% endif %}
             {% else %}
                 {% if order.shipped_status == False %}
-                <span class="btn btn-success" style="margin-right: 40px;">Order Approved</span>
+                    {% if order.cancel_status == False %}
+                    <span class="btn btn-success" style="margin-right: 40px;">Order Approved</span>
+                    {% if order.cancel_status == False %}
+                    <a href="{% url 'order-cancel' order.id %}" class="btn btn-danger btn-block btn-sm me-1" style="width:80px!important; margin-right: 40px!important;">Cancel</a>
+                    {% endif %}
+                    {% else %}
+                    <span class="btn btn-secondary" style="margin-right: 40px;">Order Canceled</span>
+                    {% endif %}
                 {% else %}
                 {% if order.delivery_status == False %}
+                
                 <span class="btn btn-success" style="margin-right: 40px;">Order Shipped</span>
+                    {% if order.cancel_status == False %}
+                    <a href="{% url 'order-cancel' order.id %}" class="btn btn-danger btn-block btn-sm me-1" style="width:80px!important; margin-right: 40px!important;">Cancel</a>
+                    {% endif %}
                 {% endif %}
                 {% endif %}
             {% endif %}
@@ -36,9 +47,14 @@
                     <div style="flex:1"><p>{{item.quantity}}</p></div>
                     <div style="flex:1">
                         {% if order.delivery_status == True %}
-                            <span class="btn btn-success" style="margin-left: 50px;">Return</span>
+                            {% if order.return_status == False %}
+                            <a href="{% url 'order-return' order.id %}" class="btn btn-success btn-block btn-sm m-1">Return</a>
+                            {% else %}
+                            <span class="btn btn-success" style="margin-left: 50px;">Order Returned</span>
+                            {% endif %}
                         {% endif %}
                     </div>
+                    <input type="text" class="d-none" value="{{order.delivery_date}}">
                 </div>
                 {% endif %}
                 
@@ -55,5 +71,4 @@
     {% endif %}
     {% endfor %}
 </div>
-
 {% endblock %}

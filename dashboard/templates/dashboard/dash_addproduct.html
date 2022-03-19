@@ -68,16 +68,7 @@
     <div class="row">
         <form  method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            {% for field in form %}
-            <div class="row g-3 align-items-center">
-                <div class="col-auto">
-                  <label for="inputPassword6" class="col-form-label">{{field.label}}</label>
-                </div>
-                <div class="col-auto">
-                  {{field}}
-                </div>
-              </div>
-            {% endfor %}
+            {{ form|crispy }}
             <button type="submit" class="btn btn-success" >Add Category</button>
         </form>
         </div>

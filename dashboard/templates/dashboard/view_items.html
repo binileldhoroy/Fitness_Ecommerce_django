@@ -22,7 +22,7 @@
                         <p>{{order.user.first_name}} {{order.user.last_name}}</p>
                         {% for item in items %}
                         <div class="cart-row">
-                            <div style="flex:2"><img class="row-image" style="height: 100px;" src="{{item.product.imageUrl}}"></div>
+                            <div style="flex:2"><img class="row-image" style="height: 100px;" src="{{item.product.image1Url}}"></div>
                             <div style="flex:2"><p>{{item.product.product_name}}</p></div>
                             <div style="flex:1"><p>{{item.product.product_discount_price}}₹</p></div>
                             <div style="flex:1"><p>{{item.quantity}}</p></div>
@@ -40,13 +40,19 @@
                     {% endif %}
                 {% else %}
                     {% if order.shipped_status == False %}
+                    {% if order.cancel_status == False %}
                     <a href="{% url 'order-shipped' order.id %}" class="btn btn-success btn-block btn-sm m-1">Ship Now</a>
+                    {% else %}
+                    <span class="btn btn-secondary">Order Canceled</span>
+                    {% endif %}
                     {% else %}
                         {% if order.delivery_status == True %}
                             <span   span class="btn btn-success">Order Delivered</span>
+                            <span>{{order.delivery_date}}</span>
                         {% endif %}
                         {% if order.delivery_status == False %}
                             <a href="{% url 'order-delivered' order.id %}" class="btn btn-success btn-block btn-sm m-1">Delivered</a>
+                            
                         {% endif %}
                     {% endif %}
                 {% endif %}

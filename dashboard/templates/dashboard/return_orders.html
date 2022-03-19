@@ -6,7 +6,7 @@
         <h3 class="text-themecolor">Dashboard</h3>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
-            <li class="breadcrumb-item active">Order list</li>
+            <li class="breadcrumb-item active">Return list</li>
         </ol>
     </div>
 </div>
@@ -15,18 +15,16 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Basic Table</h4>
-                <h6 class="card-subtitle">Add class <code>.table</code></h6>
+                <h4 class="card-title">Return Orders</h4>
+                
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
                                 <th>Order Id</th>
                                 <th>Order By</th>
-                                <th>Date</th>
                                 <th>Items</th>
                                 <th>Total Amount</th>
-                                <th>Status</th>
                                 <th>View</th>
                             </tr>
                         </thead>
@@ -38,21 +36,9 @@
                                     <p>#{{order.id}}</p>
                                 </td>
                                 <td>{{order.user.username}}</td>
-                                <td>{{order.date}}</td>
                                 <td>{{order.get_cart_items}}</td>
                                 <td>{{order.payment.payment_amount}}</td>
-                                <td>
-                                    {% if order.delivery_status == True %}
-                                        <p style="color: green;">Product Delivered</p>
-                                    {% else %}
-                                        {% if order.cancel_status == True %}
-                                        <p style="color: rgb(245, 99, 99);">Order Cancled</p>
-                                        {% else %}
-                                        <p style="color: orange;">Order Pending</p>
-                                        {% endif %}
-                                    {% endif %}
-                                </td>
-                                <td><a href="{% url 'order-items' order.id %}" class="btn btn-success btn-block btn-sm m-1">View Items</a></td>
+                                <td><a href="" class="btn btn-success btn-block btn-sm m-1">Completed</a></td>
                             </tr>
                             {% endif %}
                             {% endfor %}

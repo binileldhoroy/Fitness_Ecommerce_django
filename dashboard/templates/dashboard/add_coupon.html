@@ -10,7 +10,7 @@
                 {% csrf_token %}
                 {{ form|crispy }}
                 <div class="input-group mb-3">
-                    <input type="date" class="form-control" placeholder="Date" name="coupon_date" aria-label="Username" aria-describedby="basic-addon1">
+                    <input type="date" class="form-control seldate" placeholder="Date" name="coupon_date" aria-label="Username" aria-describedby="basic-addon1">
                   </div>
                   
                 <button type="submit" class="btn btn-success btn-md ">Add</button>
@@ -47,6 +47,11 @@
                         <td>{{coupon.valid_to}}</td>
                         <td>{{coupon.discount}}</td>
                         <td>{{coupon.active}}</td>
+                        <td>
+                            <div class="d-flex">
+                                <a href="{% url 'delete-coupon' coupon.id %}" class="btn btn-danger btn-block btn-sm m-1" onclick="return deleteCoupon(this,event)">Delete</a>
+                            </div>
+                        </td>
                        </tr>
                     {% endfor %}
                 </tbody>
@@ -57,4 +62,33 @@
       
 </div>
 </div>
+<script>
+    function deleteCoupon(url,e) {
+        e.preventDefault()
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this  file!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((willDelete) => {
+            if (willDelete) {
+        
+            window.location.href= url.href
+         
+
+            } else {
+              swal("Your file is safe!");
+            }
+          });
+
+
+}
+$(document).ready(function () {
+    var date = new Date().toISOString().slice(0,10)
+    $('.seldate').attr('min',date)
+
+  });
+</script>
 {% endblock %}

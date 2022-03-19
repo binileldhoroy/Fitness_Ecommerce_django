@@ -1,4 +1,5 @@
 import json
+from multiprocessing.connection import deliver_challenge
 from django.shortcuts import redirect, render
 from django.contrib import messages
 from .models import *
@@ -26,14 +27,18 @@ def loginView(request):
     if request.user.is_authenticated:
         return redirect('index')
     if request.method == 'POST':
+        # breakpoint()
         not_active = User.objects.filter(is_active=False)
         not_active.delete()
         uname = request.POST.get('username')
         password = request.POST.get('password')
         try:
+            user = None
             user = User.objects.get(username=uname)
         except:
             messages.error(request,'User does not exits')
+            return redirect('login')
+            
         if user.adminstatus == False:
             user = authenticate(request,username=uname,password=password)
             if user is not None:
@@ -378,12 +383,17 @@ def updateCartItem(request):
     # action = data['action']
     productId = request.POST.get('productId')
     action = request.POST.get('action')
+    action = request.POST.get('action')
+    delete_cart = request.POST.get('delete_cart')
+    print(delete_cart)
     user = request.user
     product = Product.objects.get(id=productId)
     cur_stock = product.stock
     order, created = Order.objects.get_or_create(user=user, order_status=False,buy_now=False)
 
     orderItem, created = OrderItem.objects.get_or_create(order=order,product=product)
+    
+
     if cur_stock > orderItem.quantity:
         stock = 1
     else:
@@ -391,7 +401,7 @@ def updateCartItem(request):
 
     if action == 'add' and cur_stock > orderItem.quantity:
         orderItem.quantity = (orderItem.quantity + 1)
-    elif action == 'remove':
+    elif action == 'remove' and orderItem.quantity != 1:
         orderItem.quantity = (orderItem.quantity - 1)
 
         if cur_stock > orderItem.quantity:
@@ -400,12 +410,17 @@ def updateCartItem(request):
             stock = 0
 
     orderItem.save()
-    if orderItem.quantity <= 0:
+    if delete_cart == 'delete_cart':
         orderItem.delete()
+    
     response = {'items':order.get_cart_items,'quantity':orderItem.quantity,
     'total':orderItem.get_total,'cart_total':order.get_cart_total,'productId':productId,'stock':stock}
     return JsonResponse(response)
 
+def deleteCartItem(request,pk):
+    item = OrderItem.objects.get(id=pk)
+    item.delete()
+    return redirect('cart')
 
 @never_cache
 @login_required(login_url='login')
@@ -507,6 +522,20 @@ def orderCancel(request,pk):
 
     context = {'orders':order,'items':items,'order':order}
     return render(request,'fitness/myorders.html',context)
+
+def returnOrder(request,pk):
+    if request.user.is_authenticated:
+        Order.objects.filter(id=pk).update(return_status=True)
+        order = Order.objects.get(id=pk)
+        items = order.orderitem_set.all()
+        for item in items:
+            item_quantity = item.quantity
+            product_stock = item.product.stock
+            product_id = item.product.id
+            stock_updated = product_stock + item_quantity
+            Product.objects.filter(id = product_id).update(stock = stock_updated)
+        return redirect('my-orders')
+    return render(request,'fitness/myorders.html')
 
 @never_cache
 @login_required(login_url='login')
@@ -714,12 +743,14 @@ def addWishList(request):
                 wishlist = WishList.objects.get_or_create(wish_user=user,wish_product=product)
                 result = 'added'
                 status = 'added to'
+                msg = 'success'
             elif action == 'remove_wish':
                 wishlist = WishList.objects.get(wish_user=user,wish_product=product)
                 wishlist.delete()
                 result = 'removed'
                 status = 'removed from'
-        data = {'result':result,'productId':productId,'status':status}
+                msg = 'error'
+        data = {'result':result,'productId':productId,'status':status,'msg':msg}
     return JsonResponse(data)
 
 
