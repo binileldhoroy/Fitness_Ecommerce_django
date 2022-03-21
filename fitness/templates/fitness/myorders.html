@@ -1,6 +1,6 @@
 {% extends 'main.html' %}
 {% block content %}
-
+{% load static %}
 <div class="container mt-3">
     {% for order in orders %}
     {% if order.get_cart_items >= 1 %}
@@ -66,9 +66,99 @@
             {% if order.coupon %}
                 <span style="color: rgb(250, 141, 141);">Coupon Applyed!</span>
             {% endif %}
+            <!-- Button trigger modal -->
+            {% if order.cancel_status == False %}
+                {% if order.return_status == False %}
+            <div class="container w-100 p-0 d-flex justify-content-end">                
+                <button type="button"  class="btn btn-primary mb-2" style="width:80px!important; margin-right: 26px!important;" data-bs-toggle="modal" data-bs-target="#exampleModal{{order.id}}">
+                    Invoice
+                </button>
+            </div>
+            {% endif %}
+            {% endif %}
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal{{order.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Product Invoice</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+x
+        <div class="modal-body" id="invoicetable{{order.id}}">
+                <table>
+                    <tr>
+                        <td>
+                            <b>Invoice Number:</b> {{order.id}}
+                        <p><b>Order Date:</b> {{order.date}}</p>
+                    </td>
+                    
+                    <td>
+                        <b>Shipping Address</b>
+                        <p>{{order.address.f_name}} {{order.address.l_name}},
+                            {{order.address.email}}, {{order.address.phone}},
+                            {{order.address.address1}}, {{order.address.address2}}
+                            {{order.address.city}},
+                            {{order.address.state}},
+                            {{order.address.pincode}},
+                            {{order.address.post_office}}</p>
+                        </td>
+                    </tr>
+                </table>
+                <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Product Name</th>
+                    <th scope="col">Qty</th>
+                    <th scope="col">Discount </th>
+                    <th scope="col">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                {% if item.order == order %}
+                <tr>
+                    <td>{{item.product.product_name}}</td>
+                    <td>{{item.quantity}}</td>
+                    <td>{{item.quantity}}</td>
+                    <td>{{item.product.product_discount_price}}₹</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+        <span class="container w-100 p-0 d-flex justify-content-end"><b> Grand Total:- ₹ {{order.get_cart_total}}</b></span>
+    </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button id="invoice" class="btn btn-primary">Download Invoice</button>
+        </div>
+      </div>
+    </div>
+  </div>
         </div>
     </div>
     {% endif %}
     {% endfor %}
 </div>
+<script src="{% static 'dashboard/js/html2pdf.bundle.min.js' %}"></script>
+  <script>
+  document.getElementById('invoice').onclick = function(){
+    var date = new Date().toISOString().slice(0,19);
+    console.log(date)
+    var invoice = document.getElementById('invoicetable');
+    var opt = {
+      margin:       1,
+      filename:     'ProductInvoice'+ date +'.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    
+    html2pdf(invoice, opt)
+  };
+</script>
 {% endblock %}

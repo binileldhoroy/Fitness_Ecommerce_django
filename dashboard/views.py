@@ -1,4 +1,5 @@
 from encodings import utf_8
+from multiprocessing import context
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from fitness.models import *
@@ -6,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
-from .forms import CouponForm, ProductForm,CategoryForm
+from .forms import BannerForm, CouponForm, ProductForm,CategoryForm
 from .models import *
 from django.db.models import Sum
 from datetime import datetime
@@ -107,6 +108,8 @@ def blockUser(request,pk):
             return redirect('user-view')
     else:
         return redirect('login')
+
+
 @never_cache
 @login_required(login_url='admin-login')
 def addProduct(request):
@@ -217,6 +220,15 @@ def editCategory(request,pk):
     else:
         return redirect('login')
 
+@never_cache
+@login_required(login_url='admin-login')
+def deleteCategory(request,pk):
+    if request.user.username == 'binil':
+        category = Category.objects.get(id=pk)
+        category.delete()
+        return redirect('add-category')
+    else:
+        return redirect('login')
 
 @never_cache
 @login_required(login_url='admin-login')
@@ -492,3 +504,61 @@ def editCoupon(request,pk):
         return render(request,'dashboard/edit_coupon.html',{'form':form})
     else:
         return redirect('login')
+
+def addCategoryOffer(request):
+    category = Category.objects.exclude(category_discount=0).order_by('-id')
+    offer_cat = Category.objects.filter(category_discount=0)
+    context = {'category':category,'offer_cat':offer_cat}
+    if request.method == 'POST':
+        offer = request.POST.get('offer')
+        cat_id = request.POST.get('catid')
+        category_offer = Category.objects.filter(id=cat_id)
+        category_offer.update(category_discount=offer)
+        messages.success(request,'Offer Adder Successfully')
+        return redirect('category-offer')
+    return render(request,'dashboard/add_category_offer.html',context)
+
+
+def deleteOffer(request,pk):
+    category = Category.objects.filter(id=pk)
+    category.update(category_discount=0)
+    return redirect('category-offer')
+
+
+def addProductOffer(request):
+    product = Product.objects.filter(product_discount=0)
+    offer_products = Product.objects.exclude(product_discount=0).order_by('-id')
+    context = {'products':product,'offer_products':offer_products}
+    if request.method == 'POST':
+        offer = request.POST.get('offer')
+        product_id = request.POST.get('proid')
+        product_offer = Product.objects.filter(id=product_id)
+        product_offer.update(product_discount=offer)
+        messages.success(request,'Offer Adder Successfully')
+        return redirect('product-offer')
+    return render(request,'dashboard/add_product_offer.html',context)
+
+
+def deleteProductOffer(request,pk):
+    product = Product.objects.filter(id=pk)
+    product.update(product_discount=0)
+    return redirect('product-offer')
+    
+
+def addBanner(request):
+    banners = Banner.objects.all()
+    form = BannerForm()
+    if request.method == 'POST':
+        form = BannerForm(request.POST,request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request,'Banner Added!')
+            return redirect('add-banner')
+    context = {'form':form,'banners':banners}
+    return render(request,'dashboard/add_banner.html',context)
+
+
+def deleteBanner(request,pk):
+    banner = Banner.objects.get(id=pk)
+    banner.delete()
+    return redirect('add-banner')

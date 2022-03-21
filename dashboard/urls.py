@@ -13,6 +13,7 @@ urlpatterns = [
     path('delete-product/<str:pk>',views.deleteProduct,name='delete-product'),
     path('delete-coupon/<str:pk>',views.deleteCoupon,name='delete-coupon'),
     path('add-category',views.addCategory,name='add-category'),
+    path('delete-category/<str:pk>',views.deleteCategory,name='delete-category'),
     path('edit-category/<str:pk>',views.editCategory,name='edit-category'),
     path('order-list',views.viewOrders,name='order-list'),
     path('return-view',views.returnOrderView,name='return-view'),
@@ -27,5 +28,11 @@ urlpatterns = [
     path('export-pdf/',views.exportPdf,name='export-pdf'),
     path('add-coupon/',views.addCoupon,name='add-coupon'),
     path('edit-coupon/<str:pk>',views.editCoupon,name='edit-coupon'),
+    path('category-offer/',views.addCategoryOffer,name='category-offer'),
+    path('delete-offer/<str:pk>',views.deleteOffer,name='delete-offer'),
+    path('product-offer',views.addProductOffer,name='product-offer'),
+    path('delete-product-offer/<str:pk>',views.deleteProductOffer,name='delete-product-offer'),
+    path('add-banner',views.addBanner,name='add-banner'),
+    path('delete-banner/<str:pk>',views.deleteBanner,name='delete-banner'),
 
 ]

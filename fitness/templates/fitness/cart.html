@@ -4,140 +4,219 @@
 {% load static %}
 
 <div class="container">
-<div class="row mt-5 mb-5">
-    <div class="col-lg-12">
-        {% if order.get_cart_items >= 1 %}
-        <div class="box-element">
-            <table class="table">
-                <tr>
-                    <th><h5>Items: <strong id="items" >{{order.get_cart_items}}</strong></h5></th>
-                    <th><h5>Total:<strong id="cart_total">₹{{order.get_cart_total|floatformat:2}}</strong></h5></th>
-                    <th>
-                        <a style="float:right; margin:5px;" id="checkout" class="btn btn-success" href="{% url 'check-out' %}">Checkout</a>
-                        
-                    </th>
-                </tr>
-            </table>
+    <div class="row mt-5 mb-5">
+        <div class="col-lg-12">
+            {% if order.get_cart_items >= 1 %}
+            <div class="box-element">
+                <table class="table">
+                    <tr>
+                        <th>
+                            <h5>Items: <strong id="items">{{order.get_cart_items}}</strong></h5>
+                        </th>
+                        <th>
+                            <h5>Total:<strong id="cart_total">₹{{order.get_cart_total|floatformat:2}}</strong></h5>
+                        </th>
+                        <th>
+                            <a style="float:right; margin:5px;" id="checkout" class="btn btn-success"
+                                href="{% url 'check-out' %}">Checkout</a>
 
-        </div>
+                        </th>
+                    </tr>
+                </table>
 
-        <br>
-        <div class="box-element p-3">
-            <div class="cart-row">
-                <div style="flex:2"></div>
-                <div style="flex:2"><strong>Item</strong></div>
-                <div style="flex:1"><strong>Price</strong></div>
-                <div style="flex:1"><strong>Quantity</strong></div>
-                <div style="flex:1"><strong>Total</strong></div>
-                <div style="flex:1"><strong></strong></div>
             </div>
-            {% for item in items %}
-            <div class="cart-row" id="{{item.product.id}}">
-                <div style="flex:2"><img class="row-image" src="{{ item.product.image1.url }}"></div>
-                <div style="flex:2"><p style=" margin-top: 15px;">{{item.product.product_name}}</p></div>
-                <div style="flex:1"><p style=" margin-top: 15px;">₹{{item.product.product_discount_price}}</p></div>
-                <div style="flex:1">
-                    <p class="quantity" id="quantity">x {{item.quantity}}</p>
-                    <div class="quantity" style=" margin-top: 10px;">
-                       <span id="btntrue"> <img  data-product="{{item.product.id}}" data-action="add" class="chg-quantity update-cart" src="{% static  'fitness/images/up-arrow.png' %}"></span>
-                       <!-- <span id="btnfalse"> <img  class="chg-quantity" src="{% static  'fitness/images/up-arrow.png' %}"></span> -->
-                
-                        <img data-product="{{item.product.id}}" data-action="remove" class="chg-quantity update-cart" src="{% static  'fitness/images/down-arrow.png' %}">
-                    </div>
-                    <span id="max_stock" style="font-size: 12px; color: red;">Max Stock</span>
+
+            <br>
+            <div class="box-element p-3">
+                <div class="cart-row">
+                    <div style="flex:2"></div>
+                    <div style="flex:2"><strong>Item</strong></div>
+                    <div style="flex:1"><strong>Price</strong></div>
+                    <div style="flex:1"><strong>Quantity</strong></div>
+                    <div style="flex:1"><strong>Total</strong></div>
+                    <div style="flex:1"><strong></strong></div>
                 </div>
-                <div style="flex:1"><p style=" margin-top: 15px;">₹<span id="total">{{ item.get_total|floatformat:2 }}</span></p></div>
-                <div style="flex:1" class="mt-3"><a href="{% url 'delete-cart' item.id %}" ><span data-delete="delete_cart" style="color: rgb(83, 83, 83);"><i class="fa-solid fa-trash"></i></span></a></div>
+                {% for item in items %}
+                <div class="cart-row" id="{{item.product.id}}">
+                    <div style="flex:2"><img class="row-image" src="{{ item.product.image1.url }}"></div>
+                    <div style="flex:2">
+                        <p style=" margin-top: 15px;">{{item.product.product_name}}</p>
+                    </div>
+                    <div style="flex:1">
+                        <p style=" margin-top: 15px;">₹{{item.product.product_discount_price}}</p>
+                    </div>
+                    <div style="flex:1">
+                        <p class="quantity" id="quantity">x {{item.quantity}}</p>
+                        <div class="quantity" style=" margin-top: 10px;">
+                            <span id="btntrue"> <img data-product="{{item.product.id}}" data-action="add"
+                                    class="chg-quantity update-cart"
+                                    src="{% static  'fitness/images/up-arrow.png' %}"></span>
+                            <!-- <span id="btnfalse"> <img  class="chg-quantity" src="{% static  'fitness/images/up-arrow.png' %}"></span> -->
+
+                            <img data-product="{{item.product.id}}" data-action="remove"
+                                class="chg-quantity update-cart" src="{% static  'fitness/images/down-arrow.png' %}">
+                        </div>
+                        <span id="max_stock" style="font-size: 12px; color: red;">Max Stock</span>
+                    </div>
+                    <div style="flex:1">
+                        <p style=" margin-top: 15px;">₹<span id="total">{{ item.get_total|floatformat:2 }}</span></p>
+                    </div>
+                    {% if request.user.is_authenticated %}
+                    <div style="flex:1" class="mt-3"><a href="{% url 'delete-cart' item.id %}"><span
+                                 style="color: rgb(83, 83, 83);"><i
+                                    class="fa-solid fa-trash"></i></span></a></div>
+                    {% else %}
+                    <div style="flex:1" class="mt-3" ><span 
+                         style="color: rgb(83, 83, 83);"><i data-dItem="delete_item" data-dProduct="{{item.product.id}}"
+                            class="fa-solid fa-trash update-cart"></i></span></div>
+                    {% endif %}
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            {% else %}
+            <a class="btn btn-outline-dark" href="{% url 'home' %}">&#x2190; Continue Shopping</a>
+            <div class=" text-center p-5">
+                <img src="{% static 'fitness/images/emptycart.gif' %}" width="200" alt="">
+            </div>
+            {% endif %}
         </div>
-        {% else %}
-        <a  class="btn btn-outline-dark" href="{% url 'home' %}">&#x2190; Continue Shopping</a>
-        {% endif %}
     </div>
-</div>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-$('.update-cart').on('click',function (e) {
+    $('.update-cart').on('click', function (e) {
 
-    if('{{ user }}' == 'AnonymousUser'){ 
-				var productId = $(this).data('product')
-				var action = $(this).data('action')
-				  if (action == 'add'){
-					if (cart[productId] == undefined){
-					cart[productId] = {'quantity':1}
-					}else{
-					  cart[productId]['quantity'] += 1
-					}
-				  }
-                  if(action == 'remove'){
-                    cart[productId]['quantity'] -= 1
-
-                    if(cart[productId]['quantity'] <= 0){
-                        console.log('item Removed')
-                        delete cart[productId]
-                    }
-                }
-				  console.log('CART:', cart)
-				  document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
-				  location.reload()
-				
-			}else{
-
-                
-                
-                var product = $(this).data('product')
-                var action = $(this).data('action')
-                var delete_cart = $(this).data('delete')
-                console.log(product)
-                console.log(action)
+        if ('{{ user }}' == 'AnonymousUser') {
+            var productId = $(this).data('product')
+            var action = $(this).data('action')
+            var delete_action = $(this).data('ditem')
+            var delete_product = $(this).data('dproduct')
+            console.log(delete_action)
+            if (action == 'add') {
                 $.ajax({
-                    type : 'POST',
-                    url : "{% url 'update-item' %}",
-                    data : {
-                        productId : product,
-                        action : action,
-                        delete_cart : delete_cart,
-                        csrfmiddlewaretoken : "{{ csrf_token }}"
+                    url: "{% url 'stock-chech-cookie' %}",
+                    data: {
+                        product: productId
                     },
-                    dataType: 'json',
-                    success:function(response){
-                        var items = response.items
-                        var quantity = response.quantity
-                        var total = response.total
-                        var cart_total = response.cart_total
-                        var productId = response.productId
+                    success: function (response) {
                         var stock = response.stock
-                       
-                        
-                       
-                        
-                        // console.log(cur_stock)
-                        if(stock == 0){
-                            $('#'+productId + ' #max_stock').show();
-                        }else{
-                            $('#'+productId + ' #max_stock').hide();
+                        var items = response.order.get_cart_items
+                        // var total = response.price * parseFloat(cart[productId]['quantity'])
+                        var cart_total = response.order.get_cart_total
+                        var productId = response.product
+                        console.log(response.price)
+
+                            if (parseFloat(stock) > parseFloat(cart[productId]['quantity'])){
+                                cart[productId]['quantity'] += 1
+                                document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+                                var total_id = '#' + productId + " #total"
+                                var item_id = " #items"
+                                var cart_total_id = " #cart_total"
+                                var quantity_id = '#' + productId + " #quantity"
+
+                                $(total_id).html((response.price * parseFloat(cart[productId]['quantity'])).toFixed(2))
+                                $(item_id).html(items + 1)
+                                $(cart_total_id).html('₹' + (cart_total + response.price).toFixed(2))
+                                $(quantity_id).html('x ' + cart[productId]['quantity'])
+                                // $('#cart_items').html(items)
+                            }else{
+                                var toastMixin = Swal.mixin({
+                                    toast: true,
+                                    icon: 'error',
+                                    title: 'General Title',
+                                    animation: false,
+                                    position: 'bottom',
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                    timerProgressBar: true,
+                                    didOpen: (toast) => {
+                                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                        }
+                                    });
+
+                                    toastMixin.fire({
+                                        animation: true,
+                                        title: 'Max Stock Reached'
+                                    })
+
                         }
-                        
-                        
-                        var total_id = '#' + productId + " #total"
-                        var item_id =  " #items"
-                        var cart_total_id = " #cart_total"
-                        var quantity_id = '#' + productId + " #quantity"
-                        
-                        $(total_id).html(total.toFixed(2))
-                        $(item_id).html(items )
-                        $(cart_total_id).html('₹' + cart_total.toFixed(2))
-                        $(quantity_id).html('x ' + quantity)
-                        $('#cart_items').html(items)
-                        
-                        
                     }
-                });
+                })
+
             }
-});
+            if (action == 'remove' && cart[productId]['quantity'] > 1) {
+                cart[productId]['quantity'] -= 1
+                location.reload()
+
+                // if (cart[productId]['quantity'] <= 0) {
+                //     console.log('item Removed')
+                //     delete cart[productId]
+                //     location.reload()
+                // }
+            }
+
+            if(delete_action == 'delete_item'){
+                delete cart[delete_product]
+                location.reload()
+            }
+            document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+            
+         
+
+
+        } else {
+
+
+
+            var product = $(this).data('product')
+            var action = $(this).data('action')
+            var delete_cart = $(this).data('delete')
+            console.log(product)
+            console.log(action)
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'update-item' %}",
+                data: {
+                    productId: product,
+                    action: action,
+                    delete_cart: delete_cart,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                dataType: 'json',
+                success: function (response) {
+                    var items = response.items
+                    var quantity = response.quantity
+                    var total = response.total
+                    var cart_total = response.cart_total
+                    var productId = response.productId
+                    var stock = response.stock
+                    
+                    // console.log(cur_stock)
+                    if (stock == 0) {
+                        $('#' + productId + ' #max_stock').show();
+                    } else {
+                        $('#' + productId + ' #max_stock').hide();
+                    }
+
+
+                    var total_id = '#' + productId + " #total"
+                    var item_id = " #items"
+                    var cart_total_id = " #cart_total"
+                    var quantity_id = '#' + productId + " #quantity"
+
+                    $(total_id).html(total.toFixed(2))
+                    $(item_id).html(items)
+                    $(cart_total_id).html('₹' + cart_total.toFixed(2))
+                    $(quantity_id).html('x ' + quantity)
+                    $('#cart_items').html(items)
+
+
+                }
+            });
+        }
+    });
 </script>
 
 {% endblock %}

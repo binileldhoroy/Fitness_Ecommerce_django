@@ -24,4 +24,5 @@ def cookieCart(request):
             'get_total':total
             }
         items.append(item)
+
     return {'order':order,'items':items}

@@ -74,8 +74,21 @@
                                         <span class="money"> {{product.product_discount_price| floatformat:2}}₹</span>
                                         {% if product.price > product.product_discount_price %}
                                         <strike class="money"> {{product.price | floatformat:2}}₹</strike>
+                                            {% if product.product_discount %}
+                                            <span style="color: #26a541 !important;">{{product.product_discount}}%</span>
+                                            {% elif product.category.category_discount %}
+                                            <span style="color: #26a541 !important;">{{product.category.category_discount}}%</span>
+                                            {% endif %}
                                         {% endif %}
-                                        <a href="{% url 'product' product.id %}" class="btn btn-info btn-view btn-block btn-sm m-1">View</a>
+                                        <div class="mt-1 ">
+                                            {% if product.stock == 0 %}
+                                            <span style=" color: red;">Out Of Stock</span>
+                                            <a  class="btn btn-info btn-view btn-block btn-sm mt-3">Add to Cart</a>
+                                            {% else %}                                          
+                                            <a href="{% url 'buy-now' product.id %}" class="btn btn-info btn-view btn-block btn-sm ">Buy Now</a>
+                                            <button id="test" data-product="{{product.id}}" data-action="add" class="btn btn-info btn-view btn-cart btn-block btn-sm  add-btn update-cart">Add to Cart</button>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                                 
@@ -179,6 +192,96 @@ $('.wish_list').on('click',function(e){
 })
 
 
+</script>
+<script>
+    
+    $('.update-cart').on('click',function (e) {
+        if('{{ user }}' == 'AnonymousUser'){ 
+				var productId = $(this).data('product')
+				var action = 'add'
+				  if (action == 'add'){
+					if (cart[productId] == undefined){
+					cart[productId] = {'quantity':1}
+					}else{
+					  cart[productId]['quantity'] += 1
+					}
+				  }
+				  console.log('CART:', cart)
+				  document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+				  location.reload()
+				
+			}else{
+                var product = $(this).data('product')
+                var action = $(this).data('action')
+                console.log(product)
+                console.log(action)
+                $.ajax({
+                    type : 'POST',
+                    url : "{% url 'update-item' %}",
+                    data : {
+                        productId : product,
+                        action : action,
+                        csrfmiddlewaretoken : "{{ csrf_token }}"
+                    },
+                    dataType: 'json',
+                    success:function(response){
+                        var productId = response.productId
+                        var stock = response.stock
+                        var items = response.items
+                        
+                        
+                        // console.log(cur_stock)
+                        if(stock == 0){
+                            $('#'+productId + ' #add_cart').show();
+                            var toastMixin = Swal.mixin({
+                                toast: true,
+                                icon: 'error',
+                                title: 'General Title',
+                                animation: false,
+                                position: 'bottom',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                }
+                            });
+
+                            toastMixin.fire({
+                                animation: true,
+                                title: 'Product out of stock'
+                            })
+                        }else{
+                            $('#'+productId + ' #add_cart').hide();
+                            var toastMixin = Swal.mixin({
+                                toast: true,
+                                icon: 'success',
+                                title: 'General Title',
+                                animation: false,
+                                position: 'bottom',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                }
+                            });
+
+                            toastMixin.fire({
+                                animation: true,
+                                title: 'Product added to Cart'
+                            })
+                        }
+                        $('#cart_items').html(items)
+                        
+                    }
+                });
+            }
+    });
+  
+			
 </script>
 
 {% endblock %}

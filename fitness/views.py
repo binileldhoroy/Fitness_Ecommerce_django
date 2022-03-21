@@ -1,5 +1,6 @@
 import json
 from multiprocessing.connection import deliver_challenge
+from urllib import response
 from django.shortcuts import redirect, render
 from django.contrib import messages
 from .models import *
@@ -187,7 +188,7 @@ def otpVerifySignUp(request):
             messages.error(request,"Invalid Entry")
         else:
             try:
-                phone_number = request.session.pop('phone_number')
+                phone_number = request.session.get('phone_number')
             except:
                 messages.error(request,'SignUp Faild try again')
                 return redirect('signup')
@@ -198,12 +199,14 @@ def otpVerifySignUp(request):
                 status = otp_verify_code(request,number,otp)
             except TwilioRestException as e:
                 messages.error(request,e)
+            
             if status == 'approved':
                 try:
                     user = User.objects.get(phone= phone_number)
                 except:
                     messages.error(request,'SignUp failed Try again')
                     return redirect('index')
+                del request.session['phone_number']
                 user.is_active = True
                 user.save()
                 login(request,user)
@@ -760,3 +763,16 @@ def myWishList(request):
     counts = products.count()
     wish = [i.wish_product for i in  WishList.objects.filter(wish_user=user)]
     return render(request,'fitness/mywishlist.html',{'products':products,'wish':wish,'counts':counts})
+
+def stockChechCookie(request):
+    product = request.GET['product']
+    cur_product = Product.objects.get(id=product)
+    stock = cur_product.stock
+    cookieData = cookieCart(request)
+    order = cookieData['order']
+    items = cookieData['items']
+    item = {}
+    for i in items:
+        item.update(i)
+    print(item)
+    return JsonResponse({'stock':stock,'order':order,'product':product,'price':cur_product.product_discount_price})

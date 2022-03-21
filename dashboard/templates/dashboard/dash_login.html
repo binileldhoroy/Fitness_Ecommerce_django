@@ -7,18 +7,39 @@
     <title>Document</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"/>
-    
+    <!-- sweetalert2 -->
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/sweetalert2@10.10.1/dist/sweetalert2.min.css'>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.10.1/dist/sweetalert2.all.min.js"></script>
+    <!-- sweetalert2 -->
 </head>
 <body>
   {% for message in messages %}
-  <div class="alert {{ message.tags }} alert-dismissible fade show msg-tag" role="alert">
-      {{ message | safe }}
-      <button type="button" class="close msg-close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-      </button>
-  </div>
+    
+<script>
+   Swal.fire({
+          toast: true,
+          title: "{{ message | safe }}!",
+          icon: 'error',
+          animation: false,
+          position: "bottom",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener("mouseenter", Swal.stopTimer);
+            toast.addEventListener("mouseleave", Swal.resumeTimer);
+          },
+        });
+</script>
 
-  {% endfor %}
+{% endfor %}
+<script>
+    $('.msg-close').on('click',function(){
+        $('.msg-tag').hide()
+    })
+</script>
+
+
     <div class="container">
         <section class="vh-100">
             <div class="container py-5 h-100">

@@ -33,6 +33,11 @@
                     <h3>{{product.product_name}}</h3>
                     {% if product.price > product.product_discount_price %}
                     <strike class="money"> {{product.price | floatformat:2}}₹</strike>
+                        {% if product.product_discount %}
+                        <span style="color: #26a541 !important;">{{product.product_discount}}%</span>
+                        {% elif product.category.category_discount %}
+                        <span style="color: #26a541 !important;">{{product.category.category_discount}}%</span>
+                        {% endif %}
                     {% endif %}
                     <h5>Rs. {{product.product_discount_price | floatformat:2}}₹</h5>
                     <div class="available mt-3">
@@ -50,7 +55,7 @@
                             <div class="social-ficons mt-4">
                                 <ul>
                                     {% if product.stock == 0 %}
-                                    <li><button id="test"  class="btn btn-info btn-view btn-cart btn-block btn-sm m-1 add-btn ">Add to Cart</button></li>
+                                    <!-- <li><button id="test"  class="btn btn-info btn-view btn-cart btn-block btn-sm m-1 add-btn ">Add to Cart</button></li> -->
                                     <li><span style=" color: red;">Out Of Stock</span></li>
                                     {% else %}
                                     <li><button id="test" data-product="{{product.id}}" data-action="add" class="btn btn-info btn-view btn-cart btn-block btn-sm m-1 add-btn update-cart">Add to Cart</button></li>
@@ -144,11 +149,28 @@
                         // console.log(cur_stock)
                         if(stock == 0){
                             $('#'+productId + ' #add_cart').show();
+                            var toastMixin = Swal.mixin({
+                                toast: true,
+                                icon: 'error',
+                                title: 'General Title',
+                                animation: false,
+                                position: 'bottom',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                }
+                            });
+
+                            toastMixin.fire({
+                                animation: true,
+                                title: 'Product out of stock'
+                            })
                         }else{
                             $('#'+productId + ' #add_cart').hide();
-                        }
-                        $('#cart_items').html(items)
-                        var toastMixin = Swal.mixin({
+                            var toastMixin = Swal.mixin({
                                 toast: true,
                                 icon: 'success',
                                 title: 'General Title',
@@ -167,6 +189,9 @@
                                 animation: true,
                                 title: 'Product added to Cart'
                             })
+                        }
+                        $('#cart_items').html(items)
+                        
                     }
                 });
             }

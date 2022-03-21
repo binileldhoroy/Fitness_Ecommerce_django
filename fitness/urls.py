@@ -35,4 +35,5 @@ urlpatterns = [
     path('filter/',views.filterData,name='filter'),
     path('wish-list/',views.addWishList,name='wish-list'),
     path('my-wishlist/',views.myWishList,name='my-wishlist'),
+    path('stock-chech-cookie/',views.stockChechCookie,name='stock-chech-cookie'),
 ]
