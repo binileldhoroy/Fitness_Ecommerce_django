@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ske$ik$msphn0oxq+@%k0^2sqr27^frh*on+gyucr31&wq9q(('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*','3.86.182.123','ec2-3-86-182-123.compute-1.amazonaws.com']
 
@@ -88,7 +88,7 @@ DATABASES = {
         'USER':config('database_user'),
         'PASSWORD':config('database_password'),
         'HOST':config('database_host'),
-        'POST':'5432',
+        'PORT':'5432',
     }
 }
 
