@@ -761,8 +761,9 @@ def myWishList(request):
     user = request.user
     products = WishList.objects.filter(wish_user=user)
     counts = products.count()
+    order = Order.objects.get(user = user,order_status=False)
     wish = [i.wish_product for i in  WishList.objects.filter(wish_user=user)]
-    return render(request,'fitness/mywishlist.html',{'products':products,'wish':wish,'counts':counts})
+    return render(request,'fitness/mywishlist.html',{'products':products,'wish':wish,'counts':counts,'order':order})
 
 def stockChechCookie(request):
     product = request.GET['product']
