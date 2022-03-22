@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-ske$ik$msphn0oxq+@%k0^2sqr27^frh*on+gyucr31&wq9q((
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*','54.221.28.63','fitnessonlineshop.tk','www.fitnessonlineshop.tk']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
