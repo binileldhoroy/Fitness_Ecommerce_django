@@ -637,8 +637,9 @@ def myProfile(request):
 @login_required(login_url='login')
 def myAddress(request):
     if request.user.is_authenticated:
-        form = AddressForm()
         user = request.user
+        Order.objects.filter(user = user,order_status=False,buy_now=True).delete()
+        form = AddressForm()
         address = user.shippingaddress_set.all()
         order = Order.objects.get(user = user,order_status=False)
         counts = WishList.objects.filter(wish_user=user).count()
@@ -654,6 +655,7 @@ def myAddress(request):
             state = request.POST.get('state'),
             pincode = request.POST.get('pin'),
             post_office = request.POST.get('office')
+            number = str(phone)[2:12]
             if f_name == '': 
                 messages.error(request,'Field is required') 
                 return redirect('my-address')
@@ -666,11 +668,11 @@ def myAddress(request):
             if phone == '': 
                 messages.error(request,'Field is required') 
                 return redirect('my-address')
-            elif len(str(phone)) < 10:
-                messages.error(request,'minimum length is 10') 
+            elif len(number) <= 9:
+                messages.error(request,'Phone number minimum length is 10') 
                 return redirect('my-address')
-            elif len(str(phone)) > 10:
-                messages.error(request,'maximum legth is 10') 
+            elif len(number) >= 11:
+                messages.error(request,'Phone number maximum legth is 10') 
                 return redirect('my-address')
 
             if address1 == '': 
@@ -836,3 +838,4 @@ def stockChechCookie(request):
         item.update(i)
     print(item)
     return JsonResponse({'stock':stock,'order':order,'product':product,'price':cur_product.product_discount_price})
+    
