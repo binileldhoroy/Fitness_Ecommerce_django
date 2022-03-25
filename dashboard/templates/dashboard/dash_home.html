@@ -62,8 +62,8 @@ new Chart(order, {
 });
 
 const pyamethod = document.getElementById('salesamount').getContext('2d');
-var xValues = ['COD','RazorPay','PayPal'];
-var yValues = {{paymethod|safe}};
+var xPay = ['COD','RazorPay','PayPal'];
+var yPay = {{paymethod|safe}};
 var barColors = [
   "#FF0000",
   "#007ED6",
@@ -73,10 +73,10 @@ var barColors = [
 new Chart(pyamethod, {
   type: "doughnut",
   data: {
-    labels: xValues,
+    labels: xPay,
     datasets: [{
       backgroundColor: barColors,
-      data: yValues
+      data: yPay
     }]
   },
   options: {
@@ -90,17 +90,17 @@ new Chart(pyamethod, {
 
 
 const product = document.getElementById('salesyearcount').getContext('2d');
-var xValues = {{prod|safe}};
-var yValues = {{stock|safe}};
+var xProduct = {{prod|safe}};
+var yProduct = {{stock|safe}};
 var barColors = ["red", "#02a38b","#005ca5","orange","brown","#FFEC00","#7CDDDD","#f3a853","#9bd06d","#e086bd","#31397d"];
 
 new Chart(product, {
   type: "bar",
   data: {
-    labels: xValues,
+    labels: xProduct,
     datasets: [{
       backgroundColor: barColors,
-      data: yValues
+      data: yProduct
     }]
   },
   options: {

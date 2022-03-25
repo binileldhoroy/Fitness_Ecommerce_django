@@ -1,6 +1,5 @@
 from encodings import utf_8
-from multiprocessing import context
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from fitness.models import *
 from django.contrib import messages

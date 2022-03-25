@@ -72,9 +72,10 @@
             {% if order.cancel_status == False %}
                 {% if order.return_status == False %}
             <div class="container w-100 p-0 d-flex justify-content-end">                
-                <button type="button"  class="btn btn-primary mb-2" style="width:80px!important; margin-right: 26px!important;" data-bs-toggle="modal" data-bs-target="#exampleModal{{order.id}}">
+                <!-- <button type="button"  class="btn btn-primary mb-2" style="width:80px!important; margin-right: 26px!important;" data-bs-toggle="modal" data-bs-target="#exampleModal{{order.id}}">
                     Invoice
-                </button>
+                </button> -->
+                <a href="{% url 'invoice' order.id %}" class="btn btn-info btn-sm"></a>
             </div>
             {% endif %}
             {% endif %}
@@ -88,7 +89,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
-        <div class="modal-body" id="invoicetable{{order.id}}" >
+        <div class="modal-body"  >
                 <table>
                     <tr>
                         <td>
