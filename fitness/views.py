@@ -840,13 +840,13 @@ def stockChechCookie(request):
     return JsonResponse({'stock':stock,'order':order,'product':product,'price':cur_product.product_discount_price})
     
 
-def orderInvoice(request,pk):
-    if request.user.is_authenticated:
-        user = request.user
-        address = user.shippingaddress_set.all()
-        order = Order.objects.filter(id=pk)
-        items = OrderItem.objects.all()
-        for ords in order:
-            print(ords)
-        context = {'order':order,'items':items}
-        return render(request,'fitness/invoice.html',context)
+# def orderInvoice(request,pk):
+#     if request.user.is_authenticated:
+#         user = request.user
+#         address = user.shippingaddress_set.all()
+#         order = Order.objects.filter(id=pk)
+#         items = OrderItem.objects.all()
+#         for ords in order:
+#             print(ords)
+#         context = {'order':order,'items':items}
+#         return render(request,'fitness/invoice.html',context)
