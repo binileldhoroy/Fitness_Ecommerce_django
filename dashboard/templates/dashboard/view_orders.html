@@ -42,14 +42,18 @@
                                 <td>{{order.get_cart_items}}</td>
                                 <td>{{order.payment.payment_amount}}</td>
                                 <td>
-                                    {% if order.delivery_status == True %}
-                                        <p style="color: green;">Product Delivered</p>
-                                    {% else %}
-                                        {% if order.cancel_status == True %}
-                                        <p style="color: rgb(245, 99, 99);">Order Cancled</p>
+                                    {% if order.delivery_status == False %}
+                                        {% if order.delivery_status == True %}
+                                            <p style="color: green;">Product Delivered</p>
                                         {% else %}
-                                        <p style="color: orange;">Order Pending</p>
+                                            {% if order.cancel_status == True %}
+                                            <p style="color: rgb(245, 99, 99);">Order Cancled</p>
+                                            {% else %}
+                                            <p style="color: orange;">Order Pending</p>
+                                            {% endif %}
                                         {% endif %}
+                                    {% else %}
+                                    <p style="color: rgb(253, 0, 0);">Product Returened</p>
                                     {% endif %}
                                 </td>
                                 <td><a href="{% url 'order-items' order.id %}" class="btn btn-success btn-block btn-sm m-1">View Items</a></td>

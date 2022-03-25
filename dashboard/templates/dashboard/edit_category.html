@@ -16,7 +16,7 @@
       <div class="col-md-12 col-12">
           <div class="card" style="margin-top: 30px;">
               <div class="card-body">
-    <form  method="POST">
+    <form  method="POST" novalidate>
         {% csrf_token %}
         {{ form|crispy }}
         <button type="submit" id="confirm-btn" class="btn btn-success" >Update</button>

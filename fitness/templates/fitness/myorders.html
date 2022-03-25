@@ -1,7 +1,9 @@
 {% extends 'main.html' %}
 {% block content %}
 {% load static %}
+<script src="{% static 'dashboard/js/html2pdf.bundle.min.js' %}"></script>
 <div class="container mt-3">
+    {% if ordercount >= 1 %}
     {% for order in orders %}
     {% if order.get_cart_items >= 1 %}
     <div class="box-element mt-5">
@@ -85,8 +87,8 @@
           <h5 class="modal-title" id="exampleModalLabel">Product Invoice</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-x
-        <div class="modal-body" id="invoicetable{{order.id}}">
+
+        <div class="modal-body" id="invoicetable{{order.id}} >
                 <table>
                     <tr>
                         <td>
@@ -106,7 +108,7 @@ x
                         </td>
                     </tr>
                 </table>
-                <table class="table">
+                <table class="table" id="invoicetable{{order.id}}">
             <thead>
                 <tr>
                     <th scope="col">Product Name</th>
@@ -134,22 +136,44 @@ x
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button id="invoice" class="btn btn-primary">Download Invoice</button>
+          <button id="invoice{{order.id}}" class="btn btn-primary">Download Invoice</button>
         </div>
       </div>
     </div>
   </div>
         </div>
     </div>
+    <script>
+        document.getElementById('invoice{{order.id}}').onclick = function(){
+          var date = new Date().toISOString().slice(0,19);
+          var invoice = document.getElementById('invoicetable{{order.id}}');
+          console.log(invoice)
+          var opt = {
+            margin:       1,
+            filename:     'ProductInvoice'+ date +'.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+          };
+          
+          html2pdf(invoice, opt)
+        };
+      </script>
     {% endif %}
     {% endfor %}
+    {% else %}
+    <div class="text-center">
+        <img src="{% static 'fitness/images/empty-list.gif' %}" width="30%" alt="">
+    </div>
+    {% endif %}
 </div>
-<script src="{% static 'dashboard/js/html2pdf.bundle.min.js' %}"></script>
-  <script>
-  document.getElementById('invoice').onclick = function(){
+
+  <!-- <script>
+  document.getElementById('invoice{{order.id}}').onclick = function(){
     var date = new Date().toISOString().slice(0,19);
     console.log(date)
-    var invoice = document.getElementById('invoicetable');
+    var invoice = document.getElementById('invoicetable{{order.id}}');
+    console.log(invoice)
     var opt = {
       margin:       1,
       filename:     'ProductInvoice'+ date +'.pdf',
@@ -160,5 +184,5 @@ x
     
     html2pdf(invoice, opt)
   };
-</script>
+</script> -->
 {% endblock %}

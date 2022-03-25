@@ -50,13 +50,14 @@
                     <div id="click-div" ADD ADDRESS</div>
                     <div id="section-A" class="tab-pane mt-4">
 
-                        <form action="" method="POST">
+                        <form action="" method="POST" novalidate>
                             {% csrf_token %}
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="inputEmail4">First Name</label>
-                                    <input type="text" name="firstname" class="form-control" id="inputEmail4"
-                                        placeholder="First Name" required>
+                                    <input type="text" name="firstname" onkeyup="FNameValidate()" class="form-control" id="name1"
+                                        placeholder="First Name" >
+                                        <p class="error-msg" id="errormsg4"></p>
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="inputEmail4">Last Name</label>
@@ -83,7 +84,7 @@
                             <div class="form-group">
                                 <label for="inputAddress2">Address 2</label>
                                 <input type="text" class="form-control" id="inputAddress2" name="address2"
-                                    placeholder="Apartment, studio, or floor" required>
+                                    placeholder="Apartment, studio, or floor" >
                             </div>
 
                             <div class="form-row">
@@ -121,6 +122,95 @@
     </div>
 </div>
 
+<script>
+    function validate(e) {
+        e.preventDedault()
+  if (
+    nameValidate() == true &&
+    emailValidate() == true &&
+    mobileValidate() == true &&
+    passwordValidate() == true
+  ) {
+    return true;
+  } else {
+    alert("Please Enter Correct details");
+    return false;
+  }
+}
 
+function nameValidate() {
+  var varname = $("#name").val();
+  var pattern = /^[a-zA-Z\\s]/;
+
+  if (varname == "") {
+    $("#errormsg4").html("Name is mandatory");
+    return false;
+  } else if (varname.match(pattern)) {
+    $("#errormsg4").html("");
+    return true;
+  } else {
+    $("#errormsg4").html("Enter correct name");
+    return false;
+  }
+}
+
+function emailValidate() {
+  var varEmail = $("#email").val();
+  var emailPattern = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+
+  if (varEmail == "") {
+    $("#errormsg1").html("Email is mandatory");
+    return false;
+  } else if (varEmail.match(emailPattern)) {
+    $("#errormsg1").html("");
+    return true;
+  } else {
+    $("#errormsg1").html("Enter correct Email");
+    return false;
+  }
+}
+
+function mobileValidate() {
+  var varMobile = $("#number").val();
+  var mobilePattern = /^[0-9]{10}$/;
+
+  if (varMobile == "") {
+    $("#errormsg2").html("Mobile Number is mandatory");
+    return false;
+  } else if (varMobile.length < 10 || varMobile.length > 10) {
+    $("#errormsg2").html("Number should be 10 digits");
+  } else if (varMobile.match(mobilePattern)) {
+    $("#errormsg2").html("");
+    return true;
+  } else {
+    $("#errormsg2").html("");
+    return false;
+  }
+}
+
+function passwordValidate() {
+  var password = $("#password1").val();
+  var confirmPassword = $("#password2").val();
+
+  if (password == "") {
+    $("#errormsg3").html("Password is mandatory");
+    return false;
+  } else if (
+    (password.length < 8 || password.length > 16) &&
+    (confirmPassword.length < 8 || confirmPassword.length > 16)
+  ) {
+    $("#errormsg6").html("Password Should be in between 8 and 16 characters");
+    return false;
+  } else if (confirmPassword != password) {
+    $("#errormsg6").html("Password doesn't matches");
+    return false;
+  } else {
+    $("#errormsg3").html("");
+    $("#errormsg6").html("");
+    $("#successmsg").html("Password Matches");
+    return true;
+  }
+}
+</script>
 
 {% endblock %}

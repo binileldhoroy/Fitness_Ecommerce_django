@@ -62,12 +62,12 @@
                         <p style=" margin-top: 15px;">₹<span id="total">{{ item.get_total|floatformat:2 }}</span></p>
                     </div>
                     {% if request.user.is_authenticated %}
-                    <div style="flex:1" class="mt-3"><a href="{% url 'delete-cart' item.id %}"><span
-                                 style="color: rgb(83, 83, 83);"><i
+                    <div style="flex:1" class="mt-3"><a href="{% url 'delete-cart' item.id %}" onclick="return itemdelete(this,event)"><span
+                                 style="color: rgb(83, 83, 83);" ><i
                                     class="fa-solid fa-trash"></i></span></a></div>
                     {% else %}
                     <div style="flex:1" class="mt-3" ><span 
-                         style="color: rgb(83, 83, 83);"><i data-dItem="delete_item" data-dProduct="{{item.product.id}}"
+                         style="color: rgb(83, 83, 83); cursor: pointer;"><i data-dItem="delete_item" data-dProduct="{{item.product.id}}"
                             class="fa-solid fa-trash update-cart"></i></span></div>
                     {% endif %}
                 </div>
@@ -84,6 +84,30 @@
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    function itemdelete(url,e) {
+        e.preventDefault()
+        swal({
+            title: "Are you sure?",
+            text: "Do you want to remove this item!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((willDelete) => {
+            if (willDelete) {
+        
+            window.location.href= url.href
+            
+
+            } else {
+              swal("Item does not removed!");
+            }
+          });
+
+
+}
+</script>
 <script>
     $('.update-cart').on('click', function (e) {
 
@@ -102,10 +126,8 @@
                     success: function (response) {
                         var stock = response.stock
                         var items = response.order.get_cart_items
-                        // var total = response.price * parseFloat(cart[productId]['quantity'])
                         var cart_total = response.order.get_cart_total
                         var productId = response.product
-                        console.log(response.price)
 
                             if (parseFloat(stock) > parseFloat(cart[productId]['quantity'])){
                                 cart[productId]['quantity'] += 1
@@ -147,19 +169,59 @@
 
             }
             if (action == 'remove' && cart[productId]['quantity'] > 1) {
-                cart[productId]['quantity'] -= 1
-                location.reload()
+                // cart[productId]['quantity'] -= 1
+                // location.reload()
 
-                // if (cart[productId]['quantity'] <= 0) {
-                //     console.log('item Removed')
-                //     delete cart[productId]
-                //     location.reload()
-                // }
+                $.ajax({
+                    url: "{% url 'stock-chech-cookie' %}",
+                    data: {
+                        product: productId
+                    },
+                    success: function (response) {
+                        var stock = response.stock
+                        var items = response.order.get_cart_items
+                        var cart_total = response.order.get_cart_total
+                        var productId = response.product
+
+                                cart[productId]['quantity'] -= 1
+                                document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+                                var total_id = '#' + productId + " #total"
+                                var item_id = " #items"
+                                var cart_total_id = " #cart_total"
+                                var quantity_id = '#' + productId + " #quantity"
+
+                                $(total_id).html((response.price * parseFloat(cart[productId]['quantity'])).toFixed(2))
+                                $(item_id).html(items - 1)
+                                $(cart_total_id).html('₹' + (cart_total - response.price).toFixed(2))
+                                $(quantity_id).html('x ' + cart[productId]['quantity'])
+                                // $('#cart_items').html(items)
+                            
+                    }
+                })
+
             }
 
             if(delete_action == 'delete_item'){
+                console.log(cart[delete_product])
+                swal({
+            title: "Are you sure?",
+            text: "Do you want to remove this item!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((willDelete) => {
+            if (willDelete) {
+        
                 delete cart[delete_product]
                 location.reload()
+                document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+
+            } else {
+              swal("Item does not removed!");
+            }
+          });
+                
             }
             document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
             

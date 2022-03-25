@@ -194,10 +194,13 @@ def addCategory(request):
         category = Category.objects.all()
         if request.method == 'POST':
             category = request.POST.get('name')
+            if category == '':
+                messages.error(request,'Field is required')
+                return redirect('add-category')
             Category.objects.get_or_create(name=category)
             messages.success(request,'Cateory is Added')
             return redirect('add-category')
-        
+        print(form)
         return render(request,'dashboard/dash_addproduct.html',{'form':form,'category':category})
     else:
         return redirect('login')
@@ -511,6 +514,9 @@ def addCategoryOffer(request):
     context = {'category':category,'offer_cat':offer_cat}
     if request.method == 'POST':
         offer = request.POST.get('offer')
+        if offer == '':
+            messages.error(request,'field is empty')
+            return redirect('category-offer')
         cat_id = request.POST.get('catid')
         category_offer = Category.objects.filter(id=cat_id)
         category_offer.update(category_discount=offer)
@@ -531,6 +537,9 @@ def addProductOffer(request):
     context = {'products':product,'offer_products':offer_products}
     if request.method == 'POST':
         offer = request.POST.get('offer')
+        if offer == '':
+            messages.error(request,'Field is required')
+            return redirect('product-offer')
         product_id = request.POST.get('proid')
         product_offer = Product.objects.filter(id=product_id)
         product_offer.update(product_discount=offer)

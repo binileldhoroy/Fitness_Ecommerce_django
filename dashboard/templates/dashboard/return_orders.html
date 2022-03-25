@@ -25,7 +25,6 @@
                                 <th>Order By</th>
                                 <th>Items</th>
                                 <th>Total Amount</th>
-                                <th>View</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -38,7 +37,7 @@
                                 <td>{{order.user.username}}</td>
                                 <td>{{order.get_cart_items}}</td>
                                 <td>{{order.payment.payment_amount}}</td>
-                                <td><a href="" class="btn btn-success btn-block btn-sm m-1">Completed</a></td>
+                                
                             </tr>
                             {% endif %}
                             {% endfor %}

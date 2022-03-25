@@ -47,16 +47,22 @@
                     {% endif %}
                     {% else %}
                         {% if order.delivery_status == True %}
+                            {% if order.cancel_status == False %} 
                             <span   span class="btn btn-success">Order Delivered</span>
-                            <span>{{order.delivery_date}}</span>
+                            {% else %}
+                            <span class="btn btn-secondary">Order Canceled</span>
+                            {% endif %}
                         {% endif %}
                         {% if order.delivery_status == False %}
+                            {% if order.cancel_status == False %}   
                             <a href="{% url 'order-delivered' order.id %}" class="btn btn-success btn-block btn-sm m-1">Delivered</a>
-                            
+                            {% else %}
+                            <span class="btn btn-secondary">Order Canceled</span>
+                            {% endif %}
                         {% endif %}
                     {% endif %}
                 {% endif %}
-                {% if order.approve_status == False %}
+                {% if order.delivery_status == False %}
                     {% if order.cancel_status == False %}
                     <a href="{% url 'order-cancel-admin' order.id %}" class="btn btn-danger btn-block btn-sm m-1">Cancle</a>
                     {% endif %}

@@ -1,5 +1,6 @@
 import json
 from multiprocessing.connection import deliver_challenge
+from traceback import print_tb
 from urllib import response
 from django.shortcuts import redirect, render
 from django.contrib import messages
@@ -54,13 +55,14 @@ def loginView(request):
 
 @never_cache
 def otpLogin(request):
-    global phone
     if request.method == 'POST':
         phone = request.POST.get('mobnumber')
+        request.session['otplogin_number'] = phone
         number = '+91' + str(phone)
         user = None
         
         try:
+            user = None
             user = User.objects.get(phone=phone)
         except:
             
@@ -70,7 +72,7 @@ def otpLogin(request):
             try:
                 status = otp_login_code(request,number)
             except TwilioRestException as e:
-                messages.error(request,e)
+                messages.error(request,'Message service error try agan later!')
             return redirect('otp-verify')
     return render(request, 'fitness/login.html')
 
@@ -81,16 +83,24 @@ def otpVerify(request):
         otp = request.POST.get('otp')
         if len(str(otp)) < 4 or len(str(otp)) > 10 :
             messages.error(request,"Invalid Entry")
+        elif otp == '':
+            messages.error(request,'Field is required')
+            return redirect('otp-verify')
         else:
-            user = User.objects.get(phone= phone)
+            otplogin_number = request.session.get('otplogin_number')
+            try:
+                user = User.objects.get(phone= otplogin_number)
+            except:
+                messages.error(request,'Account exists with this phone')
             username = user.username
-            number = '+91' + str(phone)
+            number = '+91' + str(otplogin_number)
             try:
                 status = None
                 status = otp_verify_code(request,number,otp)
             except TwilioRestException as e:
                 messages.error(request,e)
             if status == 'approved':
+                del request.session['otplogin_number']
                 if user.adminstatus == False :
                     login(request,user)
                    
@@ -154,7 +164,7 @@ def signupView(request, *args, **kwargs):
                         status = otp_login_code(request,phone_number)
                         return redirect('otp-verify-signup')
                     except TwilioRestException as e:
-                        messages.error(request,e)
+                        messages.error(request,'Enter a valid Mobile number!')
                     
             else:
                 uphone = request.POST.get('phone')
@@ -173,7 +183,7 @@ def signupView(request, *args, **kwargs):
                         status = otp_login_code(request,phone_number)
                         return redirect('otp-verify-signup')
                     except TwilioRestException as e:
-                        messages.error(request,e)
+                        messages.error(request,'Enter a valid Mobile number!')
         else:
             messages.error(request,'SignUp failed try again')
     context = {'form':form}
@@ -198,13 +208,13 @@ def otpVerifySignUp(request):
                 status = None
                 status = otp_verify_code(request,number,otp)
             except TwilioRestException as e:
-                messages.error(request,e)
+                messages.error(request,'Message service error try again later!')
             
             if status == 'approved':
                 try:
                     user = User.objects.get(phone= phone_number)
                 except:
-                    messages.error(request,'SignUp failed Try again')
+                    messages.error(request,'SignUp failed Try again!')
                     return redirect('index')
                 del request.session['phone_number']
                 user.is_active = True
@@ -343,7 +353,8 @@ def myOrders(request):
         order, created  = Order.objects.get_or_create(user = user,order_status=False,buy_now=False)
         orders = Order.objects.filter(user=user,order_status=True)
         items = OrderItem.objects.all()
-    context = {'orders':orders,'items':items,'order':order}
+        ordercount = orders.count()
+    context = {'orders':orders,'items':items,'order':order,'ordercount':ordercount}
     return render(request,'fitness/myorders.html',context)
 
 
@@ -632,6 +643,54 @@ def myAddress(request):
         order = Order.objects.get(user = user,order_status=False)
         counts = WishList.objects.filter(wish_user=user).count()
         if request.method == 'POST':
+            user = request.user,
+            f_name = request.POST.get('firstname'),
+            l_name = request.POST.get('lastname'),
+            email = request.POST.get('email'),
+            phone = request.POST.get('phone'),
+            address1 = request.POST.get('address1'),
+            address2 = request.POST.get('address2'),
+            city = request.POST.get('city'),
+            state = request.POST.get('state'),
+            pincode = request.POST.get('pin'),
+            post_office = request.POST.get('office')
+            if f_name == '': 
+                messages.error(request,'Field is required') 
+                return redirect('my-address')
+            if l_name == '': 
+                messages.error(request,'Field is required') 
+                return redirect('my-address')
+            if email == '': 
+                messages.error(request,'Field is required') 
+                return redirect('my-address')
+            if phone == '': 
+                messages.error(request,'Field is required') 
+                return redirect('my-address')
+            elif len(str(phone)) < 10:
+                messages.error(request,'minimum length is 10') 
+                return redirect('my-address')
+            elif len(str(phone)) > 10:
+                messages.error(request,'maximum legth is 10') 
+                return redirect('my-address')
+
+            if address1 == '': 
+                messages.error(request,'Field is required') 
+                return redirect('my-address')
+            if address2 == '': 
+                messages.error(request,'Field is required') 
+                return redirect('my-address')
+            if city == '': 
+                messages.error(request,'Field is required') 
+                return redirect('my-address')
+            if state == '': 
+                messages.error(request,'Field is required') 
+                return redirect('my-address')
+            if pincode == '': 
+                messages.error(request,'Field is required') 
+                return redirect('my-address')
+            if post_office == '': 
+                messages.error(request,'Field is required') 
+                return redirect('my-address')
             ShippingAddress.objects.create(
                 user = request.user,
                 f_name = request.POST.get('firstname'),

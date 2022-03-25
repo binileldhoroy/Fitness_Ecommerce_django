@@ -4,9 +4,8 @@
 
 <!--/signup -->
 <section class="banner-bottom py-5">
-    {% for error in form.errors %}
-    <p style="color: red; text-align: center;">{{error}}</p>
-    {% endfor %}
+
+  
     <div class="container">
         <div class="content-grid">
             <div class="text-center icon">
@@ -14,7 +13,7 @@
             </div>
             <div class="container-fluid">
             <div class="content-bottom ">
-                <form method="POST">
+                <form method="POST" novalidate>
                     {% csrf_token %}
                     {% for field in form %}
                     <div class="field-group">
@@ -22,10 +21,12 @@
                             <label for="floatingInput">{{field.label}}</label>
                             {{field}}
                         </div>
+                        <span style="color: rgb(255, 97, 97);">{{field.errors}}</span>
+                        
                     </div>
                     {% endfor %}
                     <div class="content-input-field">
-                        <button type="submit" class="btn">Sign Up</button>
+                        <button type="submit"  class="btn">Sign Up</button>
                     </div>
                 </form>
             </div>
@@ -36,3 +37,4 @@
 <!-- /signup -->
 
 {% endblock %}
+
