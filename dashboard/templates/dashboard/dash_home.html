@@ -35,6 +35,9 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+  window.onload = function(){
+
+ 
     const order = document.getElementById('salescount').getContext('2d');
     var xValues = ['Approved','shipped','Delivered'];
 var yValues = {{count|safe}};
@@ -60,6 +63,7 @@ new Chart(order, {
     }
   }
 });
+}
 
 const pyamethod = document.getElementById('salesamount').getContext('2d');
 var xPay = ['COD','RazorPay','PayPal'];

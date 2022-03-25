@@ -65,9 +65,8 @@ def adminHome(request):
         cod_amt = cod['payment_amount__sum']
         razor_amt = razor['payment_amount__sum']
         paypal_amt = paypal['payment_amount__sum']
-        paymethod = [cod_amt,razor_amt,paypal_amt]
+        paymethod = [round(cod_amt),round(razor_amt),round(paypal_amt)]
         # strftime("%d/%m/%Y %H:%M:%S")
-
         products = Product.objects.all()
 
         prod = []
