@@ -1,5 +1,3 @@
-from asyncio import proactor_events
-from re import T
 from django.db import models
 from fitness.models import User,ShippingAddress
 from django.core.validators import MinValueValidator, MaxValueValidator
