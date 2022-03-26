@@ -592,8 +592,8 @@ def razorpayComplete(request):
         items = order.orderitem_set.all()
 
         cur_address = request.POST.get('cur_address')
-        # p_method = request.POST.get('payment')
-        # print(p_method)
+        p_method = request.POST.get('payment')
+        print(p_method)
         address = user.shippingaddress_set.all()
         cur_order = Order.objects.get(id=order.id)
         add = ShippingAddress.objects.get(id=cur_address)
@@ -601,7 +601,7 @@ def razorpayComplete(request):
 
         Payment(
             order = cur_order,
-            payment_method = 'razorpay',
+            payment_method = p_method,
             payment_status = True,
             payment_amount = round(total,2)
         ).save()
