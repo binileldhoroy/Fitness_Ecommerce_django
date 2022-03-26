@@ -65,6 +65,29 @@ new Chart(order, {
 });
 }
 
+const product = document.getElementById('salesyearcount').getContext('2d');
+var xProduct = {{prod|safe}};
+var yProduct = {{stock|safe}};
+var barColors = ["red", "#02a38b","#005ca5","orange","brown","#FFEC00","#7CDDDD","#f3a853","#9bd06d","#e086bd","#31397d"];
+
+new Chart(product, {
+  type: "bar",
+  data: {
+    labels: xProduct,
+    datasets: [{
+      backgroundColor: barColors,
+      data: yProduct
+    }]
+  },
+  options: {
+    legend: {display: false},
+    title: {
+      display: true,
+      text: "Product and Stock"
+    }
+  }
+});
+
 const pyamethod = document.getElementById('salesamount').getContext('2d');
 var xPay = ['COD','RazorPay','PayPal'];
 var yPay = {{paymethod|safe}};
@@ -93,29 +116,38 @@ new Chart(pyamethod, {
 
 
 
-const product = document.getElementById('salesyearcount').getContext('2d');
-var xProduct = {{prod|safe}};
-var yProduct = {{stock|safe}};
-var barColors = ["red", "#02a38b","#005ca5","orange","brown","#FFEC00","#7CDDDD","#f3a853","#9bd06d","#e086bd","#31397d"];
+</script>
+<canvas id="myChart" width="400" height="400"></canvas>
+<script>
 
-new Chart(product, {
-  type: "bar",
-  data: {
-    labels: xProduct,
-    datasets: [{
-      backgroundColor: barColors,
-      data: yProduct
-    }]
-  },
-  options: {
-    legend: {display: false},
-    title: {
-      display: true,
-      text: "Product and Stock"
+const data = {
+  labels: ['COD','RazorPay','PayPal'],
+  datasets: [{
+    label: 'My First Dataset',
+    data: {{paymethod|safe}},
+    backgroundColor: [
+      'rgb(255, 99, 132)',
+      'rgb(54, 162, 235)',
+      'rgb(255, 205, 86)'
+    ],
+    hoverOffset: 4
+  }]
+};
+const ctx = document.getElementById('myChart').getContext('2d');
+const myChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: data,
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
     }
-  }
 });
-    </script>
+
+
+</script>
 
 
 {% endblock %}
