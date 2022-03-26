@@ -25,7 +25,7 @@
                                 <th>Order By</th>
                                 <th>Date</th>
                                 <th>Items</th>
-                                <th>Total Amount</th>
+                                <th>Total Amount/Method</th>
                                 <th>Status</th>
                                 <th>View</th>
                             </tr>
@@ -40,7 +40,7 @@
                                 <td>{{order.user.username}}</td>
                                 <td>{{order.date}}</td>
                                 <td>{{order.get_cart_items}}</td>
-                                <td>{{order.payment.payment_amount}}</td>
+                                <td>{{order.payment.payment_amount}} / <span style="background-color: rgba(134, 248, 20, 0.37); border-radius: 7px;">{{order.payment.payment_method}}</span></td>
                                 <td>
                                     
                                         {% if order.delivery_status == True %}
@@ -55,11 +55,7 @@
                                             {% else %}
                                             <p style="color: orange;">Order Pending</p>
                                             {% endif %}
-                                        {% endif %}
-                                   
-                                        
-                                       
-                                      
+                                        {% endif %}   
                                     
                                 </td>
                                 <td><a href="{% url 'order-items' order.id %}" class="btn btn-success btn-block btn-sm m-1">View Items</a></td>
