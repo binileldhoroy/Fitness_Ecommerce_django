@@ -1,50 +1,80 @@
 {% extends 'main.html' %}
 {% block content %}
-<div class="modal-body"  >
-    <table>
-        <tr>
-            <td>
-                <b>Invoice Number:</b> {{order.id}}
-            <p><b>Order Date:</b> {{order.date}}</p>
-        </td>
-        
-        <td>
-            <b>Shipping Address</b>
-            <p>{{order.address.f_name}} {{order.address.l_name}},
-                {{order.address.email}}, {{order.address.phone}},
-                {{order.address.address1}}, {{order.address.address2}}
-                {{order.address.city}},
-                {{order.address.state}},
-                {{order.address.pincode}},
-                {{order.address.post_office}}</p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.4/jspdf.debug.js" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.4/jspdf.min.js" ></script>
+<div class="container-fluid">
+    <div class="modal-body" id="invoicetable" >
+        <table>
+            <tr>
+                <td>
+                    <b>Invoice Number:</b> {{order.id}}
+                <p><b>Order Date:</b> {{order.date}}</p>
             </td>
+            </tr>
+            <tr>
+            <td>
+                <b>Shipping Address</b>
+                <p>{{order.address.f_name}} {{order.address.l_name}},</p>
+                    <p>{{order.address.email}}, {{order.address.phone}},</p>
+                    <p>{{order.address.address1}}, {{order.address.address2}}</p>
+                    <p>{{order.address.city}},</p>
+                    <p>{{order.address.state}},
+                    {{order.address.pincode}},
+                    {{order.address.post_office}}</p>
+                </td>
+            </tr>
+        </table>
+        <table class="table" >
+    <thead>
+        <tr>
+            <th scope="col">Product Name</th>
+            <th scope="col">Qty</th>
+            <th scope="col">Discount </th>
+            <th scope="col">Total</th>
         </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        {% if item.order == order %}
+        <tr>
+            <td>{{item.product.product_name}}</td>
+            <td>{{item.quantity}}</td>
+            <td>{{item.quantity}}</td>
+            <td>{{item.product.product_discount_price}}₹</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
     </table>
-    <table class="table" id="invoicetable">
-<thead>
-    <tr>
-        <th scope="col">Product Name</th>
-        <th scope="col">Qty</th>
-        <th scope="col">Discount </th>
-        <th scope="col">Total</th>
-    </tr>
-</thead>
-<tbody>
-    {% for item in items %}
-    {% if item.order == order %}
-    <tr>
-        <td>{{item.product.product_name}}</td>
-        <td>{{item.quantity}}</td>
-        <td>{{item.quantity}}</td>
-        <td>{{item.product.product_discount_price}}₹</td>
-    </tr>
-    {% endif %}
-    {% endfor %}
-</tbody>
-</table>
-<hr>
-<span class="container w-100 p-0 d-flex justify-content-end"><b> Grand Total:- ₹ {{order.get_cart_total}}</b></span>
+    <hr>
+    <span class="container w-100 p-0 d-flex justify-content-end"><b> Grand Total:- ₹ {{order.get_cart_total}}</b></span>
+    </div>
+    <a href="javascript:generatePDF()" class="btn btn-primary" id="downloadButton">Download Invoice</a>
 </div>
+<script>
+    async function generatePDF() {
+            document.getElementById("downloadButton").innerHTML = "Currently downloading, please wait";
 
+            //Downloading
+            var downloading = document.getElementById("invoicetable");
+            var date = new Date().toISOString().slice(0,19);
+            var doc = new jsPDF('l', 'pt');
+
+            await html2canvas(downloading, {
+                //allowTaint: true,
+                //useCORS: true,
+                width: 530
+            }).then((canvas) => {
+                //Canvas (convert to PNG)
+                doc.addImage(canvas.toDataURL("image/png"), 'PNG', 5, 5, 700, 600);
+            })
+
+            doc.save("Invoice"+ date +".pdf");
+
+            //End of downloading
+
+            document.getElementById("downloadButton").innerHTML = "Download Invoice";
+        }
+</script>
 
 {% endblock %}
