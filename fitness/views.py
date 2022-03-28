@@ -627,6 +627,7 @@ def razorpayComplete(request):
 @login_required(login_url='login')
 def myProfile(request):
     user = request.user
+    Order.objects.filter(user = user,order_status=False,buy_now=True).delete()
     referral = Referral.objects.get(user=user)
     order = Order.objects.get(user = user,order_status=False)
     counts = WishList.objects.filter(wish_user=user).count()

@@ -1,8 +1,15 @@
 {% extends 'main.html' %}
 {% block content %}
-
+{% load static %}
 
 <div class="container">
+  {% if items.count < 1 %}
+  <a class="btn btn-outline-dark mt-3" href="{% url 'home' %}">&#x2190; Continue Shopping</a>
+  <div class="text-center">
+    <h4>Empty Cart</h4>
+    <img src="{% static 'fitness/images/empty-list.gif' %}" width="30%" alt="">
+  </div>
+  {% else %}
     <div class="row mt-5 mb-5">
     
         <div class="col-lg-6">
@@ -131,7 +138,7 @@
                 {% endfor %}
             </div>
             <div id="payment-info">
-              {% block bt5 %}
+
                 <div class="col-md-11 p-3 m-2 border-secondary border">
                     <h4>SELECT PAYMENT METHOD</h4>
                     <div class="text-left pl-3">
@@ -177,13 +184,14 @@
                       </div>
                     </div>
                    </div>
-                   {% endblock %}
+
             </div>
         </form>
             
             {% endif %}
         </div>
     </div>
+   {% endif %}
 </div>
 
 
